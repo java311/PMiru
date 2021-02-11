@@ -1,0 +1,161 @@
+#:kivy 1.4.0
+
+<CameraScreen>:
+    CameraLayout: 
+        Image:
+            id: cam_img
+            size: root.size
+        Scatter:
+            size: cam_img.size
+            auto_bring_to_front: False
+        ActionButton:
+            icon: "camera_red.png"
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.5, 'down':0.5}
+            on_release: root.shoot_release()
+        ActionButton:
+            icon: "config_red.png"
+            size_hint: 0.1, 0.1
+            pos_hint: {"right": 1, 'top':1}
+            on_release: root.manager.current = 'config'
+
+
+<ConfigScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                color: 1, 0, 0, 1 #red
+                text: 'Exposure'
+            TextInput: 
+                id: exp_txt
+                disabled: True
+                multiline: False
+                text: '50'
+                # hint_text:'Exposure'
+                # pos_hint: {'center_x': 0.5, 'center_y': 0.705} 
+                # size_hint: 0.95, 0.5
+                # on_text: root.exposureText_change(self.text) \
+            Label:
+                id: exp_range_label
+                color: 1, 0, 0, 1 #red
+                text: 'ms'
+            Button:
+                id: exp_up
+                text:'Up'
+                color: 1, 0, 0, 1 #red
+                disabled: True
+                on_press: root.exposureUp_press()
+            Button:
+                id: exp_down
+                text:'Down'
+                color: 1, 0, 0, 1 #red
+                disabled: True
+                on_press: root.exposureDown_press()
+            Label:
+                text: 'Range:'
+                color: 1, 0, 0, 1 #red
+            Spinner:
+                id: exp_range_select
+                size_hint: None, None
+                size: 100, 44
+                # pos_hint: {'center': (.5, .5)}
+                color: 1, 0, 0, 1 #red
+                pos_hint: {'center_y': .5}
+                text: '1~100ms'
+                values: '1~100ms', '100~1000ms'
+                on_text:
+                    root.exposureRange_change(self.text)
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                id: exp_slider_label_min
+                color: 1, 0, 0, 1 #red
+                text: '1'
+            Slider:
+                id: exp_slider
+                disabled: True
+                min: 1
+                max: 100
+                step: 1
+                value: 50
+                orientation: 'horizontal'
+                # on_value:label2.text = str(int(self.value))
+                on_value: root.updateExpSlider(self.value)
+            Label:
+                id: exp_slider_label_max
+                color: 1, 0, 0, 1 #red
+                text: '100'
+            CheckBox: 
+                id: exp_auto
+                active: True
+                color: 1, 0, 0, 1 #red
+                on_active: root.autoExposure_click(self, self.active) 
+                size_hint_x: .20
+            Label:
+                # text_size: None, None
+                text_size: self.size
+                pos_hint: {'center_y': 0.96}
+                size: self.texture_size
+                color: 1, 0, 0, 1 #red
+                text: 'Auto'
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                color: 1, 0, 0, 1 #red
+                text: 'Gain'
+            TextInput: 
+                id: gain_txt
+                color: 1, 0, 0, 1 #red
+                disabled: True
+                multiline: False
+                value: 3
+            Button:
+                id: gain_up
+                text:'Up'
+                color: 1, 0, 0, 1 #red
+                disabled: True
+                on_press: root.gainUp_press()
+            Button:
+                id: gain_down
+                text:'Down'
+                disabled: True
+                on_press: root.gainDown_press()
+            CheckBox: 
+                id: gain_auto
+                active: True
+                color: 1, 0, 0, 1 #red
+                on_active: root.autoGain_click(self, self.active) 
+                size_hint_x: .20
+            Label:
+                # text_size: None, None
+                text_size: self.size
+                pos_hint: {'center_y': 0.96}
+                size: self.texture_size
+                color: 1, 0, 0, 1 #red
+                text: 'Auto'
+        BoxLayout:
+            orientation: 'horizontal'
+            Slider:
+                id: gain_slider
+                disabled: True
+                min: 0
+                max: 100
+                step: 1
+                value: 3
+                orientation: 'horizontal'
+                # on_value:label2.text = str(int(self.value))
+                on_value: root.updateGainSlider(self.value)     
+
+        BoxLayout:
+            orientation: 'horizontal'
+            ActionButton:
+                text: 'Back to menu'
+                icon: 'left_red.png'
+                on_release: root.backToCamera_release()
+            BoxLayout:
+                orientation: 'horizontal'
+            ActionButton:
+                text: 'My settings button'
+                icon: 'right_red.png'
