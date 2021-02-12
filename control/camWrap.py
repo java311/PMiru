@@ -2,6 +2,8 @@
 import subprocess
 import sys
 import os
+from sys import platform
+from datetime import datetime
 
 # Program imports
 from control.asioCam import asioCam              #class to control the ZWO camera
@@ -12,17 +14,22 @@ class camWrap():
     camType = 'zwo'
     rootPath = ""
 
-    def __init__(self, camType, os):
-        self.camType = self.checkCamType()
+    def __init__(self):
+        #check OS 
+        if platform == 'win32':  #If Windows select the camera type manually
+            self.camType =  'zwo'
+        else:     
+            self.camType = self.checkCamType()
+
         if self.camType == 'zwo':
             asioCam()
             #global objects for ASIO camera control
             self.cam = asioCam()
 
             lib_path = "/lib/arm-linux-gnueabihf/libASICamera2.so"  #DEFAULT OS raspbian
-            if os == 'win':
+            if platform == 'win32':
                 lib_path = "C:\\pmiru\\software\\zwo\\ASI SDK\\lib\\x64\\ASICamera2.dll"
-            if os == 'ubuntu':
+            if platform == 'ubuntu':
                 lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
             
             if (self.cam.initCam(lib_path=lib_path) == True):

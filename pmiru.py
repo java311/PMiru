@@ -2,6 +2,12 @@
 import time
 import sys
 
+# Global variables 
+cam = None   #ZWO,Baumer camera control
+camType = 'zwo' 
+wheel = None  #ZWO wheel control
+enableWheel = False
+
 # Kivy imports
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
@@ -14,17 +20,9 @@ from kivy.uix.image import CoreImage
 from kivy.graphics.texture import Texture
 
 # Program python classes 
-from control.wheel_control import WheelControl   #class to control the wheel
+if enableWheel:
+    from control.wheel_control import WheelControl   #class to control the wheel
 from control.camWrap import camWrap              #class to wrap ZWO and Baumer API cameras
-
-# Global variables 
-cam = None   #ZWO,Baumer camera control
-camType = 'zwo' 
-wheel = None  #ZWO wheel control
-enableWheel = False
-
-class CameraLayout(FloatLayout):
-    pass 
 
 class FirstScreen(Screen):
     def __init__(self, **kwargs):
@@ -47,10 +45,16 @@ class CameraScreen(Screen):
 
     def shoot_release(self):
         takeHyperCube()
-        print ("shoot presionado")
+        print ("Hypercube captured")
+
+
+############  VIEWER GUI CONTROL CLASS ####################
+class ViewerScreen(Screen):
+    def build(self):
+        pass
+
 
     
-
 class ConfigScreen(Screen):
     exposure = 50    #50ms
     min_exp = 1
@@ -65,9 +69,6 @@ class ConfigScreen(Screen):
     gain = 200
     min_gain = 0
     max_gain = 1000
-
-    def build(self):
-        pass
 
     #######################  EXPOSURE CONTROLS ####################
 
@@ -181,6 +182,7 @@ class PmiruApp(App):
         self.sm = ScreenManager()
         self.sm.add_widget(CameraScreen(name='camera'))
         self.sm.add_widget(ConfigScreen(name='config'))
+        self.sm.add_widget(ViewerScreen(name='viewer'))
         return self.sm
 
     def on_start(self, **kwargs):
@@ -218,7 +220,7 @@ def takeHyperCube():
 
 if __name__ == "__main__":
     
-    camWrap = camWrap('zwo', 'raspbian') 
+    camWrap = camWrap() 
 
     if enableWheel:
         wheel=WheelControl()

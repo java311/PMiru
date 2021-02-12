@@ -1,7 +1,7 @@
 #:kivy 1.4.0
 
 <CameraScreen>:
-    CameraLayout: 
+    FloatLayout: 
         Image:
             id: cam_img
             size: root.size
@@ -18,7 +18,44 @@
             size_hint: 0.1, 0.1
             pos_hint: {"right": 1, 'top':1}
             on_release: root.manager.current = 'config'
+        ActionButton:
+            icon: "flower_red.png"
+            size_hint: 0.1, 0.1
+            pos_hint: {"right": 0.1, 'top':1}
+            on_release: root.manager.current = 'viewer'
 
+<ViewerScreen>:
+    FloatLayout:
+        Image:
+            id: viewer_img
+            size: root.size
+        Scatter:
+            size: viewer_img.size
+            auto_bring_to_front: False
+        ActionButton:
+            text: 'Back'
+            icon: 'left_red.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"left": 0, 'top':0.5}
+            on_release: root.backToCamera_release()
+        ActionButton:
+            text: 'Next'
+            icon: 'right_red.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"right":1, 'top':0.5}
+            on_release: root.backToCamera_release()
+        ActionButton:
+            text: 'Back to Camera'
+            icon: 'camera_red.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"right":1, 'top':0.1}
+            on_release: root.manager.current = 'camera'
+        ActionButton:
+            text: 'Layer Down'
+            icon: 'layers_red.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.5, 'down':0.5}
+            on_release: root.manager.current = 'camera'
 
 <ConfigScreen>:
     BoxLayout:
