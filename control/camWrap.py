@@ -13,6 +13,9 @@ class camWrap():
     cam = None
     camType = 'zwo'
     rootPath = ""
+    cubeIndex = 0
+    cubePaths = None
+    cubeFiles = None
 
     def __init__(self):
         #check OS 
@@ -153,6 +156,27 @@ class camWrap():
                 counter = counter + 1
         return retVal 
 
+    def listdir_fullpath(self, d):
+        return [os.path.join(d, f) for f in os.listdir(d)]
+
+    # get the hypercube folder list for the viewer 
+    def getCubesList(self):
+        folders = []
+        for (root,dirs,files) in os.walk(self.rootPath, topdown=True):
+            folders = dirs
+            break
+        
+        flist = []
+        for folder in folders:
+            ff = []
+            for item in self.listdir_fullpath(self.rootPath + os.path.sep + folder + os.path.sep):
+                if os.path.isfile(item) and item.endswith('.jpg'):
+                    ff.append(item)
+            flist.append(ff)
+
+        
+        return folders, flist
+
     # sets the default path and gets the number of the lats pic 
     def setRootPath(self, path=""):
         if path == "":
@@ -161,6 +185,8 @@ class camWrap():
                 os.mkdir(self.rootPath) #create folder if do not exists
         else:
             self.rootPath = rootPath
+
+
     
 
     

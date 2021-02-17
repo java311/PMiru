@@ -7,6 +7,10 @@ cam = None   #ZWO,Baumer camera control
 camType = 'zwo' 
 wheel = None  #ZWO wheel control
 enableWheel = False
+cubeIndex = 0
+layerIndex = 0
+cubeFolders = None
+cubeFiles = None
 
 # Kivy imports
 from kivy.app import App
@@ -18,6 +22,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.button import Button
 from kivy.uix.image import CoreImage
 from kivy.graphics.texture import Texture
+from kivy.uix.image import Image
 
 # Program python classes 
 if enableWheel:
@@ -50,11 +55,49 @@ class CameraScreen(Screen):
 
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
-    def build(self):
-        pass
 
+    def on_start(self, **kwargs):
+        layerIndex = 0
+        self.viewerRefresh()
+        
+    def imageChange(self, cube_index, layer_index):
+        maxCubes = len(cubeFolders)
+        maxLayers = len(cubeFiles[cube_index])
+        self.ids.layer_txt.text = "Layer " + str(layer_index)  + " of " + str(maxLayers -1)
+        self.ids.cube_txt.text = str(cube_index) + "/" + str(maxCubes -1 )
 
+        self.ids.viewer_img.source = cubeFiles[cube_index][layer_index]
+
+    def viewerBack_release(self):
+        global cubeIndex
+        cubeIndex = cubeIndex - 1
+        if (cubeIndex < 0):
+            cubeIndex = len( cubeFolders ) - 1
+        self.imageChange(cubeIndex, 0)
+
+    def viewerNext_release(self):
+        global cubeIndex
+        cubeIndex = cubeIndex + 1
+        if cubeIndex >= len(cubeFolders) :
+            cubeIndex = 0
+        self.imageChange(cubeIndex, 0)
+
+    def viewerLayerUp_release(self):
+        global layerIndex
+        global cubeIndex
+        layerIndex = layerIndex + 1
+        if layerIndex > len(cubeFiles[cubeIndex]) -1:
+            layerIndex = 0
+        self.imageChange(cubeIndex, layerIndex)
     
+    def viewerLayerDown_release(self):
+        global layerIndex
+        global cubeIndex
+        layerIndex = layerIndex - 1
+        if layerIndex < 0:
+            layerIndex = len(cubeFiles[cubeIndex]) -1
+        self.imageChange(cubeIndex, layerIndex)
+
 class ConfigScreen(Screen):
     exposure = 50    #50ms
     min_exp = 1
@@ -221,6 +264,7 @@ def takeHyperCube():
 if __name__ == "__main__":
     
     camWrap = camWrap() 
+    cubeFolders, cubeFiles = camWrap.getCubesList()
 
     if enableWheel:
         wheel=WheelControl()

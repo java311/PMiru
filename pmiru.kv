@@ -30,6 +30,7 @@
             id: viewer_img
             size: root.size
         Scatter:
+            id: viewer_scatter
             size: viewer_img.size
             auto_bring_to_front: False
         ActionButton:
@@ -37,13 +38,13 @@
             icon: 'left_red.png'
             size_hint: 0.1, 0.1
             pos_hint: {"left": 0, 'top':0.5}
-            on_release: root.backToCamera_release()
+            on_release: root.viewerBack_release()
         ActionButton:
             text: 'Next'
             icon: 'right_red.png'
             size_hint: 0.1, 0.1
             pos_hint: {"right":1, 'top':0.5}
-            on_release: root.backToCamera_release()
+            on_release: root.viewerNext_release()
         ActionButton:
             text: 'Back to Camera'
             icon: 'camera_red.png'
@@ -52,10 +53,31 @@
             on_release: root.manager.current = 'camera'
         ActionButton:
             text: 'Layer Down'
-            icon: 'layers_red.png'
+            icon: 'layers_red_down.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.5, 'down':0.5}
-            on_release: root.manager.current = 'camera'
+            on_release: root.viewerLayerDown_release()
+        ActionButton:
+            text: 'Layer Up'
+            icon: 'layers_red_up.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x":0.5, 'top':1}
+            on_release: root.viewerLayerUp_release()
+        Label:
+            id: layer_txt
+            text: 'Layer 0 of 0'
+            color: 1, 0, 0, 1 #red
+            size_hint: 0.1, 0.1
+            font_size: '20sp'
+            pos_hint: {"x":0.6, 'top':1}
+        Label:
+            id: cube_txt
+            text: '0/0'
+            color: 1, 0, 0, 1 #red
+            size_hint: 0.1, 0.1
+            font_size: '20sp'
+            pos_hint: {"x":0.9, 'top':0.6}
+        
 
 <ConfigScreen>:
     BoxLayout:
