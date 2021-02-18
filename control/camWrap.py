@@ -77,11 +77,8 @@ class camWrap():
         return self.cam.get_video_frame()
 
     def get_img_type(self):
-        if self.camType == 'zwo':
-            return self.cam.imgType
-        else:
-            pass
-
+        return self.cam.imgType
+        
     def get_exposure(self):
         if self.camType == 'zwo':
             return self.cam.exposure
@@ -137,6 +134,9 @@ class camWrap():
             self.cam.takeSingleShoot(path=path, filename= filename )
         else: 
             pass
+
+    def setGuiResolution(self, resX, resY):
+        self.cam.setGuiResolution(resX, resY)
 
     # get the folder path wher to save the hypercube one folder per hypercube 
     def getNewFolder(self, prefix="cube_"):

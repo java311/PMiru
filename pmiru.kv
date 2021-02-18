@@ -2,12 +2,14 @@
 
 <CameraScreen>:
     FloatLayout: 
-        Image:
-            id: cam_img
-            size: root.size
         Scatter:
-            size: cam_img.size
+            size: root.size
             auto_bring_to_front: False
+            do_translation: False
+            do_rotation: False
+            Image:
+                id: cam_img
+                size: root.size
         ActionButton:
             icon: "camera_red.png"
             size_hint: 0.1, 0.1
@@ -26,13 +28,15 @@
 
 <ViewerScreen>:
     FloatLayout:
-        Image:
-            id: viewer_img
-            size: root.size
         Scatter:
             id: viewer_scatter
             size: viewer_img.size
             auto_bring_to_front: False
+            do_translation: False
+            do_rotation: False
+            Image:
+                id: viewer_img
+                size: root.size
         ActionButton:
             text: 'Back'
             icon: 'left_red.png'

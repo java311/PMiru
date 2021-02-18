@@ -4,13 +4,15 @@ import sys
 
 # Global variables 
 cam = None   #ZWO,Baumer camera control
-camType = 'zwo' 
+camType = 'baumer' 
 wheel = None  #ZWO wheel control
 enableWheel = False
 cubeIndex = 0
 layerIndex = 0
 cubeFolders = None
 cubeFiles = None
+wSizeX = 800
+wSizeY = 600
 
 # Kivy imports
 from kivy.app import App
@@ -23,6 +25,7 @@ from kivy.uix.button import Button
 from kivy.uix.image import CoreImage
 from kivy.graphics.texture import Texture
 from kivy.uix.image import Image
+from kivy.core.window import Window
 
 # Program python classes 
 if enableWheel:
@@ -37,15 +40,15 @@ class CameraScreen(Screen):
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
         frame = camWrap.get_video_frame()
-        if frame is not None:
-            image_texture = Texture.create(size=(800,600), colorfmt='rgb')
+        if frame is not None: #3648, 5472
+            image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='rgb')
             if camWrap.get_img_type() == 8:
                 image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')
             if camWrap.get_img_type() == 16:
                 image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')  #TODO not tested yet
             self.ids.cam_img.texture = image_texture
         else:
-            print ("ERROR: No image...")
+            # print ("ERROR: No image...")
             pass
 
     def shoot_release(self):
@@ -226,14 +229,24 @@ class PmiruApp(App):
         self.sm.add_widget(CameraScreen(name='camera'))
         self.sm.add_widget(ConfigScreen(name='config'))
         self.sm.add_widget(ViewerScreen(name='viewer'))
+
+        Window.size = (wSizeX, wSizeY)
+        Window.bind(on_resize=self.check_resize)
+        # Window.fullscreen = True #Maximizes Kivy Window
+
         return self.sm
 
     def on_start(self, **kwargs):
         if self.sm.current == 'camera':
             Clock.schedule_interval(self.sm.get_screen("camera").cameraRefreshCallback, 0.01)
-        else:
-            pass
-        pass
+
+
+    def check_resize(self, instance, x, y):
+        global wSizeX, wSizeY
+        wSizeX = Window.size[0]
+        wSizeY = Window.size[1]
+        camWrap.setGuiResolution(wSizeX, wSizeY)
+        
         
 
 # Rotate, change light and take picture

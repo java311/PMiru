@@ -1,14 +1,22 @@
+# NeoApi Baumer python wrapper is in:
+# /home/pi/.local/lib/python3.7/site-packages/neoapi.py
+
 # Python imports
 import neoapi
 import cv2
+import time
 import numpy as np
 from threading import Thread
 from collections import deque
 
+# NEOAPI Baumer camera class control
 class baumerCam():
     camera = None
     stop = False
     deque = None
+    imgType = 8
+    guiResX = 800
+    guiResY = 600
 
     def __init__(self, deque_size=50 ):
         #object to que the frames
@@ -22,7 +30,7 @@ class baumerCam():
         self.camera = neoapi.Cam()
         self.camera.Connect()
         self.set_exposure(10000)
-        # self.setAutoExposure()
+        self.setAutoExposure()
         self.startCaptureLoop()
 
     def set_exposure(self, value):
@@ -30,8 +38,6 @@ class baumerCam():
     
     def setAutoExposure(self):
         ob = self.camera.f.ExposureMode.Get()
-        print (ob)
-        print (type(ob))
         self.camera.f.ExposureMode.Set(1)
 
     # Starts the capture daemon
@@ -52,23 +58,36 @@ class baumerCam():
         else:
             return None
 
+    #changes the resolution of the captured image
+    def setGuiResolution(self, resX, resY):
+        self.stopCaptureLoop() #Stops the capture loop
+        time.sleep(2)  #wait for a second for the GUI to cosume the dequeue
+        self.guiResX = resX
+        self.guiResY = resY
+        self.startCaptureLoop()
+
     # Main camera capture thread
     def get_frame(self):
-        while (True):
-            if self.stop == False:
-                img = self.camera.GetImage().GetNPArray()
-                if np.sum(img) == 0:
-                    print ("empty")
-                    continue
-                # title = 'Press [ESC] to exit ..'
-                # cv2.namedWindow(title, cv2.WINDOW_NORMAL)
-                
-                img = cv2.resize(img, (800,600))
-                cv2.imshow('debugo', img)
-                cv2.waitKey(1)                 
+        try:
+            while (True):
+                if self.stop == False:
+                    buf = self.camera.GetImage(timeout=10000)  #buff class neoapi.neoapi.Image
+                    if buf.GetSize() == 0:
+                        continue
 
-                self.deque.append(img)
-        
+                    img = buf.GetNPArray() 
+                    # if np.sum(img) == 0:   # OPENCV DEBUG
+                    #     continue
+                    show = cv2.resize(img,(self.guiResX,self.guiResY))
+                    show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)                  
+                    # cv2.imshow('debugo', show)          #OPENCV DEBUG
+                    # cv2.waitKey(1)                     #OPENCV DEBUG
+
+                    self.deque.append(show)
+
+        except (neoapi.NeoException, Exception) as exc:
+            print('ERROR: ', exc.GetDescription())
+            
 
 
 

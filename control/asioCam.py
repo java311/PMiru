@@ -210,6 +210,8 @@ class asioCam():
 
     # Gets a single frame from the queue
     def get_video_frame(self):
+        print (self.stop)
+        print (len(self.deque))
         if len(self.deque) > 0 and self.stop == False:
             return self.deque[-1]
         else:
