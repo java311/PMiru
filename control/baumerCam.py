@@ -5,6 +5,7 @@
 import neoapi
 import cv2
 import time
+import os
 import numpy as np
 from threading import Thread
 from collections import deque
@@ -25,20 +26,52 @@ class baumerCam():
         self.get_frame_thread = Thread(target=self.get_frame, args=())
         self.get_frame_thread.daemon = True
 
-
     def initCam(self):
         self.camera = neoapi.Cam()
         self.camera.Connect()
-        self.set_exposure(10000)
-        self.setAutoExposure()
+        self.setAutoExposure(True)
+        self.setAutoGain(True)
+        # self.get_minmax_gain()
+        self.camera.SetSynchronFeatureMode(True)
         self.startCaptureLoop()
 
-    def set_exposure(self, value):
+    def setExposure(self, value):
+        self.setAutoExposure(False)  #auto exposure needs to be disabled
+        value = value * 1000 #convert from ms to microsec
         self.camera.f.ExposureTime.Set(value)
+
+    def setGain(self, value):
+        self.setAutoGain(False) #auto gain disabled for manual value
+        self.camera.f.Gain.Set(value)
+
+    def set_min_exposure(self):
+        self.camera.f.ExposureTime.Set(self.camera.f.ExposureTime.GetMin())
     
-    def setAutoExposure(self):
-        ob = self.camera.f.ExposureMode.Get()
-        self.camera.f.ExposureMode.Set(1)
+    def set_max_exposure(self):  #this may never end DO NOT USE
+        self.camera.f.ExposureTime.Set(self.camera.f.ExposureTime.GetMax())
+
+    def get_exposure(self):
+        return self.camera.f.ExposureTime.Get()
+
+    def get_gain(self):
+        return self.camera.f.Gain.Get()
+
+    def get_minmax_gain(self):
+        r = [ self.camera.f.GainAutoMinValue.Get(),  self.camera.f.GainAutoMaxValue.Get() ]
+        return r 
+    
+    def setAutoExposure(self, value ):
+        # 0 = Auto, 1 = Manual
+        if value == True:
+            self.camera.f.ExposureAuto.Set(0)  #Auto
+        else:
+            self.camera.f.ExposureAuto.Set(1)  #Manual
+
+    def setAutoGain(self, value):
+        if value == True:
+            self.camera.f.GainAuto.Set(0)  #Auto
+        else:
+            self.camera.f.GainAuto.Set(1)  #Manual
 
     # Starts the capture daemon
     def startCaptureLoop(self):
@@ -57,6 +90,25 @@ class baumerCam():
             return self.deque[-1]
         else:
             return None
+
+    #saves a single taken frame in a file FAKE method 
+    #only takes a single frame from the video stream
+    def takeSingleShoot(self, path, filename):
+        fullpath = path + os.path.sep + filename
+        print ("Taking frame...")
+        buf = self.camera.GetImage(timeout=10000)
+        while buf.GetSize() == 0:
+            print ('ERROR: empty buffer')
+            buf = self.camera.GetImage(timeout=10000)
+
+        img = buf.GetNPArray()
+        while np.sum(img) == 0:   # OPENCV DEBUG (check if it is not black)
+            print ('ERROR: black image')
+            buf = self.camera.GetImage(timeout=10000)
+            img = buf.GetNPArray()
+
+        cv2.imwrite(fullpath, img)
+        print ("Saving frame as: " + str(fullpath))    
 
     #changes the resolution of the captured image
     def setGuiResolution(self, resX, resY):

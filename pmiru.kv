@@ -19,12 +19,14 @@
             icon: "config_red.png"
             size_hint: 0.1, 0.1
             pos_hint: {"right": 1, 'top':1}
-            on_release: root.manager.current = 'config'
+            # on_release: root.manager.current = 'config'
+            on_release: root.screen_change('config')
         ActionButton:
             icon: "flower_red.png"
             size_hint: 0.1, 0.1
             pos_hint: {"right": 0.1, 'top':1}
-            on_release: root.manager.current = 'viewer'
+            # on_release: root.manager.current = 'viewer'
+            on_release: root.screen_change('viewer')
 
 <ViewerScreen>:
     FloatLayout:
@@ -116,40 +118,6 @@
                 color: 1, 0, 0, 1 #red
                 disabled: True
                 on_press: root.exposureDown_press()
-            Label:
-                text: 'Range:'
-                color: 1, 0, 0, 1 #red
-            Spinner:
-                id: exp_range_select
-                size_hint: None, None
-                size: 100, 44
-                # pos_hint: {'center': (.5, .5)}
-                color: 1, 0, 0, 1 #red
-                pos_hint: {'center_y': .5}
-                text: '1~100ms'
-                values: '1~100ms', '100~1000ms'
-                on_text:
-                    root.exposureRange_change(self.text)
-        BoxLayout:
-            orientation: 'horizontal'
-            Label:
-                id: exp_slider_label_min
-                color: 1, 0, 0, 1 #red
-                text: '1'
-            Slider:
-                id: exp_slider
-                disabled: True
-                min: 1
-                max: 100
-                step: 1
-                value: 50
-                orientation: 'horizontal'
-                # on_value:label2.text = str(int(self.value))
-                on_value: root.updateExpSlider(self.value)
-            Label:
-                id: exp_slider_label_max
-                color: 1, 0, 0, 1 #red
-                text: '100'
             CheckBox: 
                 id: exp_auto
                 active: True
@@ -163,6 +131,40 @@
                 size: self.texture_size
                 color: 1, 0, 0, 1 #red
                 text: 'Auto'
+            # Label:
+            #    text: 'Range:'
+            #    color: 1, 0, 0, 1 #red
+            # Spinner:
+            #    id: exp_range_select
+            #    size_hint: None, None
+            #    size: 100, 44
+            #    # pos_hint: {'center': (.5, .5)}
+            #    color: 1, 0, 0, 1 #red
+            #    pos_hint: {'center_y': .5}
+            #    text: '1~100ms'
+            #    values: '1~100ms', '100~1000ms'
+            #    on_text:
+            #        root.exposureRange_change(self.text)
+        BoxLayout:
+            orientation: 'horizontal'
+            #Label:
+            #    id: exp_slider_label_min
+            #    color: 1, 0, 0, 1 #red
+            #    text: '1'
+            Slider:
+                id: exp_slider
+                disabled: True
+                min: 1
+                max: 1000
+                step: 1
+                value: 50
+                orientation: 'horizontal'
+                # on_value:label2.text = str(int(self.value))
+                on_value: root.updateExpSlider(self.value)
+            #Label:
+            #    id: exp_slider_label_max
+            #    color: 1, 0, 0, 1 #red
+            #    text: '1000'
         BoxLayout:
             orientation: 'horizontal'
             Label:
@@ -203,7 +205,7 @@
             Slider:
                 id: gain_slider
                 disabled: True
-                min: 0
+                min: 1
                 max: 100
                 step: 1
                 value: 3

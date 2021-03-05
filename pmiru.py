@@ -13,6 +13,7 @@ cubeFolders = None
 cubeFiles = None
 wSizeX = 800
 wSizeY = 600
+sm = None #Kivy ScreenManager
 
 # Kivy imports
 from kivy.app import App
@@ -55,20 +56,34 @@ class CameraScreen(Screen):
         takeHyperCube()
         print ("Hypercube captured")
 
+    def screen_change(self, screen):
+        if (screen == 'viewer'):
+            global cubeFolders
+            global cubeFiles
+            cubeFolders, cubeFiles = camWrap.getCubesList()
+            sm.get_screen("viewer").imageChange(cubeIndex, 0)
+
+        self.manager.current = screen
+
+
 
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
-
-    def on_start(self, **kwargs):
-        layerIndex = 0
-        self.viewerRefresh()
         
     def imageChange(self, cube_index, layer_index):
         maxCubes = len(cubeFolders)
-        maxLayers = len(cubeFiles[cube_index])
-        self.ids.layer_txt.text = "Layer " + str(layer_index)  + " of " + str(maxLayers -1)
-        self.ids.cube_txt.text = str(cube_index) + "/" + str(maxCubes -1 )
+        if maxCubes == 0: 
+            self.ids.cube_txt.text = "No Captures"
+            self.ids.viewer_img.source = 'img_not_found.jpg'
+            return 
 
+        self.ids.cube_txt.text = str(cube_index) + "/" + str(maxCubes -1 )
+        maxLayers = len(cubeFiles[cube_index])
+        if maxLayers == 0: 
+            self.ids.layer_txt.text = "Layers: None"
+            self.ids.viewer_img.source = 'img_not_found.jpg'
+            return 
+        self.ids.layer_txt.text = "Layer " + str(layer_index)  + " of " + str(maxLayers -1)
         self.ids.viewer_img.source = cubeFiles[cube_index][layer_index]
 
     def viewerBack_release(self):
@@ -104,34 +119,42 @@ class ViewerScreen(Screen):
 class ConfigScreen(Screen):
     exposure = 50    #50ms
     min_exp = 1
-    max_exp = 100
+    max_exp = 1000
     # exp_label_min = ['10us','1ms','100ms','1s']
     # exp_label_max = ['10ms','100ms','1000ms','10s']
     # exp_range_values = ['10us~10ms', '1~100ms', '100~1000ms', '1s~10s']
-    exp_label_min = ['1ms','100ms']
-    exp_label_max = ['100ms','1000ms']
-    exp_range_values = ['1~100ms', '100~1000ms']
+    
+    # exp_label_min = ['1ms','100ms']
+    # exp_label_max = ['100ms','1000ms']
+    # exp_range_values = ['1~100ms', '100~1000ms']
 
-    gain = 200
-    min_gain = 0
-    max_gain = 1000
+    gain = 50
+    min_gain = 1
+    max_gain = 100
 
     #######################  EXPOSURE CONTROLS ####################
 
-    def exposureRange_change(self, text):
-        if text == self.exp_range_values[0]:      # 1~100ms
-            self.ids.exp_range_label.text = 'ms'
-            self.exposure = 50
-            self.min_exp = 1
-            self.max_exp = 100
-            self.refreshExpSlider(1)
+    # def exposureRange_change(self, text):
+    #     if text == self.exp_range_values[0]:      # 1~100ms
+    #         self.ids.exp_range_label.text = 'ms'
+    #         self.exposure = 50
+    #         self.min_exp = 1
+    #         self.max_exp = 100
+    #         self.refreshExpSlider(1)
 
-        elif text == self.exp_range_values[1]:     # 100~1000ms
-            self.ids.exp_range_label.text = 'ms'
-            self.exposure = 500
-            self.min_exp = 100
-            self.max_exp = 1000
-            self.refreshExpSlider(2) 
+    #     elif text == self.exp_range_values[1]:     # 100~1000ms
+    #         self.ids.exp_range_label.text = 'ms'
+    #         self.exposure = 500
+    #         self.min_exp = 100
+    #         self.max_exp = 1000
+    #         self.refreshExpSlider(2) 
+
+    # def refreshExpSlider(self, range):
+    #     self.ids.exp_slider_label_min.text = self.exp_label_min[range-1]
+    #     self.ids.exp_slider_label_max.text = self.exp_label_max[range-1]
+    #     self.ids.exp_slider.min = self.min_exp
+    #     self.ids.exp_slider.max = self.max_exp
+    #     self.ids.exp_slider.value = self.exposure
 
     def exposureUp_press(self): 
         if (self.exposure < self.max_exp):
@@ -145,16 +168,9 @@ class ConfigScreen(Screen):
             self.ids.exp_txt.text = str(self.exposure)  
             self.ids.exp_slider.value = self.exposure 
 
-    def refreshExpSlider(self, range):
-        self.ids.exp_slider_label_min.text = self.exp_label_min[range-1]
-        self.ids.exp_slider_label_max.text = self.exp_label_max[range-1]
-        self.ids.exp_slider.min = self.min_exp
-        self.ids.exp_slider.max = self.max_exp
-        self.ids.exp_slider.value = self.exposure
-
     def updateExpSlider(self, value):
         self.exposure = value
-        self.ids.exp_txt.text = str(int(self.exposure))
+        self.ids.exp_txt.text = str(int(value))
         
     # Callback for the checkbox 
     def autoExposure_click(self, instance, value): 
@@ -164,18 +180,19 @@ class ConfigScreen(Screen):
             self.ids.exp_slider.disabled = True
             self.ids.exp_up.disabled = True
             self.ids.exp_down.disabled = True
-            self.ids.exp_range_select.disabled = True
+            # self.ids.exp_range_select.disabled = True
         else: 
             #update the GUI values 
             self.exposure = int(camWrap.get_exposure()/1000)  #in milliseconds 
-            self.ids.exp_range_select.disabled = False
+            self.ids.exp_slider.value = self.exposure
+            # self.ids.exp_range_select.disabled = False
             self.ids.exp_slider.disabled = False
             self.ids.exp_up.disabled = False
             self.ids.exp_down.disabled = False
-            if self.exposure < 100:
-                self.exposureRange_change(self.exp_range_values[0])
-            else:
-                self.exposureRange_change(self.exp_range_values[1])
+            # if self.exposure < 100:
+            #     self.exposureRange_change(self.exp_range_values[0])
+            # else:
+            #     self.exposureRange_change(self.exp_range_values[1])
             camWrap.setAutoExposure(False)
 
     #######################  GAIN GUI CONTROLS ####################
@@ -194,7 +211,7 @@ class ConfigScreen(Screen):
 
     def updateGainSlider(self, value):
         self.gain = value
-        self.ids.gain_txt.text = str(int(self.gain))
+        self.ids.gain_txt.text = str(int(value))
 
     def autoGain_click(self, instance, value): 
         if value == True:
@@ -206,10 +223,11 @@ class ConfigScreen(Screen):
         else: 
             #update the GUI values 
             self.gain = camWrap.get_gain()  #in milliseconds 
+            self.ids.gain_slider.value = self.gain #udpate gain value
             self.ids.gain_slider.disabled = False
             self.ids.gain_up.disabled = False
             self.ids.gain_down.disabled = False
-            camWrap.setAutoGain(True)
+            camWrap.setAutoGain(False)
 
 
     #######################  GENERAL CONTROLS  ####################
@@ -218,27 +236,28 @@ class ConfigScreen(Screen):
         if self.ids.gain_auto.active == False: #if not auto exposure 
             camWrap.set_gain(self.gain)
         if self.ids.exp_auto.active == False:  #it not auto gain
-            camWrap.set_exposure(self.exposure, 'ms')
+            camWrap.set_exposure(self.exposure)
         
         self.manager.current = 'camera'  #switch screen
     
     
 class PmiruApp(App):
     def build(self):
-        self.sm = ScreenManager()
-        self.sm.add_widget(CameraScreen(name='camera'))
-        self.sm.add_widget(ConfigScreen(name='config'))
-        self.sm.add_widget(ViewerScreen(name='viewer'))
+        global sm 
+        sm = ScreenManager()
+        sm.add_widget(CameraScreen(name='camera'))
+        sm.add_widget(ConfigScreen(name='config'))
+        sm.add_widget(ViewerScreen(name='viewer'))
 
         Window.size = (wSizeX, wSizeY)
         Window.bind(on_resize=self.check_resize)
         # Window.fullscreen = True #Maximizes Kivy Window
 
-        return self.sm
+        return sm
 
     def on_start(self, **kwargs):
-        if self.sm.current == 'camera':
-            Clock.schedule_interval(self.sm.get_screen("camera").cameraRefreshCallback, 0.01)
+        if sm.current == 'camera':
+            Clock.schedule_interval(sm.get_screen("camera").cameraRefreshCallback, 0.01)
 
 
     def check_resize(self, instance, x, y):
@@ -265,7 +284,10 @@ def takeHyperCube():
         if wheel is not None:
             wheel.rotateRight()
         time.sleep(1)  #wait for the rotation to finish  #TODO make it a GUI option
-        fname = "img_" + format(counter, '02d') + ".jpg"
+        if camType == 'zwo':
+            fname = "img_" + format(counter, '02d') + ".jpg"
+        else:
+            fname = "img_" + format(counter, '02d') + ".tiff"
         camWrap.takeSingleShoot(path=folder, filename=fname)
         nSlots = nSlots -1
         counter = counter + 1

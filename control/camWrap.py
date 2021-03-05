@@ -83,45 +83,38 @@ class camWrap():
         if self.camType == 'zwo':
             return self.cam.exposure
         else:
-            pass
+            return self.cam.get_exposure()
 
     def get_gain(self):
         if self.camType == 'zwo':
             return self.cam.gain
         else:
-            pass
-
+            r = self.cam.get_gain() #range [0,10]
+            return int(r * 10)  #map to 0-100 % value
+              
     def set_exposure(self, value):
-        if self.camType == 'zwo':
-            return self.cam.setExposure(value)
-        else:
-            pass
+        self.cam.setExposure(value)
 
     def set_gain(self, value):
-        if self.camType == 'zwo':
-            return self.cam.setGain(value)
-        else:
-            pass
+        print ("set_gain")
+        print (value)
+        if self.camType == 'baumer':
+            value = value / 10.0 #map value to baumer range [0,10]
+            print (value)
+            
+        self.cam.setGain(value)
 
     def setAutoExposure(self, value):
-        if self.camType == 'zwo':
-            self.cam.setAutoExposure(value)
-        else:
-            pass
+        self.cam.setAutoExposure(value)
 
     def setAutoGain(self, value):
-        if self.camType == 'zwo':
-            self.cam.setAutoGain(value)
-        else:
-            pass
-
+        self.cam.setAutoGain(value)
 
     def captureLoop(self, value):        
         if value == False:
             self.cam.stopCaptureLoop()
         else:
             self.cam.startCaptureLoop()
-
 
     def saveControlValues(self, path, filename):
         if self.camType == 'zwo':
@@ -130,11 +123,8 @@ class camWrap():
             pass
 
     def takeSingleShoot(self, path, filename):
-        if self.camType == 'zwo':
-            self.cam.takeSingleShoot(path=path, filename= filename )
-        else: 
-            pass
-
+        self.cam.takeSingleShoot(path=path, filename= filename )
+        
     def setGuiResolution(self, resX, resY):
         self.cam.setGuiResolution(resX, resY)
 
@@ -170,7 +160,9 @@ class camWrap():
         for folder in folders:
             ff = []
             for item in self.listdir_fullpath(self.rootPath + os.path.sep + folder + os.path.sep):
-                if os.path.isfile(item) and item.endswith('.jpg'):
+                if os.path.isfile(item) and item.endswith('.jpg'):   #zwo (TODO this may be changed)
+                    ff.append(item)
+                if os.path.isfile(item) and item.endswith('.tiff'):  #baumer (saved with opencv)
                     ff.append(item)
             flist.append(ff)
 
