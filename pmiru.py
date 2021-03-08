@@ -1,5 +1,6 @@
 # Python imports 
 import time
+import cv2
 import sys
 
 # Global variables 
@@ -41,7 +42,12 @@ class CameraScreen(Screen):
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
         frame = camWrap.get_video_frame()
-        if frame is not None: #3648, 5472
+        if frame is not None:   #3648, 5472
+            #reshape the frame to the windows size anc convert to RGB 
+            frame = cv2.resize(frame,(wSizeX,wSizeY))
+            frame = cv2.cvtColor(frame,cv2.COLOR_GRAY2RGB) 
+            
+            #create texture buffer for to show the image 
             image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='rgb')
             if camWrap.get_img_type() == 8:
                 image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')
@@ -264,7 +270,6 @@ class PmiruApp(App):
         global wSizeX, wSizeY
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
-        camWrap.setGuiResolution(wSizeX, wSizeY)
         
         
 

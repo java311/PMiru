@@ -59,6 +59,24 @@ class camWrap():
             print ("ZWO camera found.")
             return 'zwo'  #zwo found 
 
+        # check if ZWO120MM (mini finder) is present
+        out = subprocess.Popen(['lsusb', '-d', '03c3:120c'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        stdout, stderr = out.communicate()
+        
+        stdout = stdout.decode('utf-8')
+        if stderr == None and stdout.find('03c3:120c') != -1:
+            print ("ZWO120MM (mini finder) camera found.")
+            return 'zwo'  #zwo found 
+ 
+        # check if ZWO178 MM is present (medium size CCD)
+        out = subprocess.Popen(['lsusb', '-d', '03c3:178c'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        stdout, stderr = out.communicate()
+        
+        stdout = stdout.decode('utf-8')
+        if stderr == None and stdout.find('03c3:178c') != -1:
+            print ("ZWO 178MM (medium size CCD) camera found.")
+            return 'zwo'  #zwo found 
+
         #check if Baumer is present 
         out = subprocess.Popen(['lsusb', '-d', '2825:0157'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         stdout, stderr = out.communicate()
@@ -124,9 +142,6 @@ class camWrap():
 
     def takeSingleShoot(self, path, filename):
         self.cam.takeSingleShoot(path=path, filename= filename )
-        
-    def setGuiResolution(self, resX, resY):
-        self.cam.setGuiResolution(resX, resY)
 
     # get the folder path wher to save the hypercube one folder per hypercube 
     def getNewFolder(self, prefix="cube_"):

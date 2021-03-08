@@ -16,8 +16,6 @@ class baumerCam():
     stop = False
     deque = None
     imgType = 8
-    guiResX = 800
-    guiResY = 600
 
     def __init__(self, deque_size=50 ):
         #object to que the frames
@@ -110,14 +108,6 @@ class baumerCam():
         cv2.imwrite(fullpath, img)
         print ("Saving frame as: " + str(fullpath))    
 
-    #changes the resolution of the captured image
-    def setGuiResolution(self, resX, resY):
-        self.stopCaptureLoop() #Stops the capture loop
-        time.sleep(2)  #wait for a second for the GUI to cosume the dequeue
-        self.guiResX = resX
-        self.guiResY = resY
-        self.startCaptureLoop()
-
     # Main camera capture thread
     def get_frame(self):
         try:
@@ -130,8 +120,8 @@ class baumerCam():
                     img = buf.GetNPArray() 
                     # if np.sum(img) == 0:   # OPENCV DEBUG
                     #     continue
-                    show = cv2.resize(img,(self.guiResX,self.guiResY))
-                    show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)                  
+                    # show = cv2.resize(img,(self.guiResX,self.guiResY)) original 
+                    # show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)       original   
                     # cv2.imshow('debugo', show)          #OPENCV DEBUG
                     # cv2.waitKey(1)                     #OPENCV DEBUG
 

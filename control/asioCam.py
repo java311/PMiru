@@ -22,7 +22,7 @@ class asioCam():
     autoExp = False
     autoGain = False
     
-    imgType = 0  #8 or 16 bits
+    imgType = 8  #8 or 16 bits
 
 
     def __init__(self, deque_size=50 ):
@@ -158,7 +158,7 @@ class asioCam():
         self.camera.set_control_value(asi.ASI_EXPOSURE, microsec_exp)
         return 
 
-
+    #Manually set the gain of the camera 
     def setGain(self, gainValue):
         self.autoGain = False
         self.setAutoGain(False)
@@ -181,7 +181,6 @@ class asioCam():
     def get_frame(self):
         whbi = self.camera.get_roi_format()
         shape = [whbi[1],whbi[0]]
-        print (shape)
         while (True):
             if self.stop == False:
                 raw = self.camera.get_video_data(timeout=self.timeout)
@@ -190,14 +189,13 @@ class asioCam():
                 else:
                     rawImg = np.frombuffer(raw, dtype=np.uint16)
                 rawImg = rawImg.reshape(shape)
-
-                # rawImg = cv2.resize(rawImg, (800,600))
-                show = cv2.resize(rawImg, (800,600))
-                show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)
+    
+                #show = cv2.resize(rawImg, (self.guiResX, self.guiResY))  #original 
+                #show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)             #original
 
                 # cv2.imshow("show", show)  #OPENCV DEBUG
                 # cv2.waitKey(1)            #OPENCV DEBUG
-                self.deque.append(show)
+                self.deque.append(rawImg)
 
 
     # Gets current image type of the camera
@@ -210,8 +208,6 @@ class asioCam():
 
     # Gets a single frame from the queue
     def get_video_frame(self):
-        print (self.stop)
-        print (len(self.deque))
         if len(self.deque) > 0 and self.stop == False:
             return self.deque[-1]
         else:

@@ -1,0 +1,67 @@
+INSTALL INSTRUCTIONS on RASPBERRY
+
+INSTALL NUMPY
+pip3 install numpy
+
+INSTALL OPENCV 3
+use pip3 (it musb be pip3) as: 
+
+pip3 install opencv-python
+
+Then install all OpenCV dependencies:
+sudo apt-get install libcblas-dev  or  libatlas-base-dev
+sudo apt-get install libhdf5-dev
+# sudo apt-get install libhdf5-serial-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libjasper-dev 
+sudo apt-get install libqtgui4 
+sudo apt-get install libqt4-test
+
+INSTALLL KIVY
+First install Kivy dependencies: 
+'sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev'
+then install kivy using pip3 
+python3 -m pip install kivy[base] kivy_examples
+
+INSTALL ZWOASI 
+pip3 install zwoasi
+
+Then it is necessary to install ASIO C++ binary library, from Astroberry PI repositories:
+wget -O - https://www.astroberry.io/repo/key | sudo apt-key add -
+sudo su -c "echo 'deb https://www.astroberry.io/repo/ buster main' > /etc/apt/sources.list.d/astroberry.list"
+sudo apt update
+sudo apt upgrade
+sudo apt-get install indi-full
+
+Additionally, for correct function ZWO cameras need to add the following line to the: /etc/rc.local
+Before the 'exit 0', add this:
+
+INSTALL NEOAPI 
+Neoapi is installed by downloading the WHL python packages from Baumer site: 
+Baumer neoAPI Python v1.0 (Linux ARM)  (armhf, tar.gz option)
+python3 --version
+Then install the whl file accordingly to your python3 version:
+python3 -m pip install neoapi-1.0.0-py[your python version]-none-any.whl 
+
+https://www.baumer.com/us/en/product-overview/industrial-cameras-image-processing/software/baumer-neoapi/c/42528
+Once you have the whl install it for the python3 version in your Raspberry: 
+
+
+Also it is necessary to increase the USB cache size of Raspberry. To do so add this line to /etc/rc.local:
+Before the 'exit 0', add this: 
+
+
+TOUCH SCREEN INSTALL
+These are the instructions for the touch screen install
+https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install-2
+
+
+FINALLY 
+Go to the folder where P-Miru is and excecute it using this command:
+python3 pmiru.py
+
+
+OPTIONAL 
+Switch beteen python2 to python3. So when you excecute python you use python3:
+
+
