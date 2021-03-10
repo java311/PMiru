@@ -2,6 +2,7 @@
 import time
 import cv2
 import sys
+import argparse
 
 # Global variables 
 cam = None   #ZWO,Baumer camera control
@@ -12,8 +13,9 @@ cubeIndex = 0
 layerIndex = 0
 cubeFolders = None
 cubeFiles = None
-wSizeX = 800
-wSizeY = 600
+maximizeStart = False
+wSizeX = 320
+wSizeY = 240
 sm = None #Kivy ScreenManager
 
 # Kivy imports
@@ -71,7 +73,8 @@ class CameraScreen(Screen):
 
         self.manager.current = screen
 
-
+    def exit_press(self):
+        sys.exit(0)
 
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
@@ -123,45 +126,24 @@ class ViewerScreen(Screen):
         self.imageChange(cubeIndex, layerIndex)
 
 class ConfigScreen(Screen):
-    exposure = 50    #50ms
-    min_exp = 1
-    max_exp = 1000
-    # exp_label_min = ['10us','1ms','100ms','1s']
-    # exp_label_max = ['10ms','100ms','1000ms','10s']
-    # exp_range_values = ['10us~10ms', '1~100ms', '100~1000ms', '1s~10s']
-    
-    # exp_label_min = ['1ms','100ms']
-    # exp_label_max = ['100ms','1000ms']
-    # exp_range_values = ['1~100ms', '100~1000ms']
 
-    gain = 50
-    min_gain = 1
-    max_gain = 100
+    def __init__(self, **kwargs):
+        super(ConfigScreen, self).__init__(**kwargs)
+
+        self.exposure = 50    #50ms
+        self.min_exp = 1
+        self.max_exp = 1000
+        self.autoExposure = True
+
+        self.gain = 50
+        self.min_gain = 1
+        self.max_gain = 100
+        self.autoGain = True  #auto gain flagdo df
+        if camType == 'zwo':
+            minmax = camWrap.getMinMaxGain() 
+            self.ids.gain_slider.max = minmax[1]
 
     #######################  EXPOSURE CONTROLS ####################
-
-    # def exposureRange_change(self, text):
-    #     if text == self.exp_range_values[0]:      # 1~100ms
-    #         self.ids.exp_range_label.text = 'ms'
-    #         self.exposure = 50
-    #         self.min_exp = 1
-    #         self.max_exp = 100
-    #         self.refreshExpSlider(1)
-
-    #     elif text == self.exp_range_values[1]:     # 100~1000ms
-    #         self.ids.exp_range_label.text = 'ms'
-    #         self.exposure = 500
-    #         self.min_exp = 100
-    #         self.max_exp = 1000
-    #         self.refreshExpSlider(2) 
-
-    # def refreshExpSlider(self, range):
-    #     self.ids.exp_slider_label_min.text = self.exp_label_min[range-1]
-    #     self.ids.exp_slider_label_max.text = self.exp_label_max[range-1]
-    #     self.ids.exp_slider.min = self.min_exp
-    #     self.ids.exp_slider.max = self.max_exp
-    #     self.ids.exp_slider.value = self.exposure
-
     def exposureUp_press(self): 
         if (self.exposure < self.max_exp):
             self.exposure = self.exposure + 1
@@ -174,19 +156,21 @@ class ConfigScreen(Screen):
             self.ids.exp_txt.text = str(self.exposure)  
             self.ids.exp_slider.value = self.exposure 
 
-    def updateExpSlider(self, value):
+    def updateExpSlider(self, instance, value):
         self.exposure = value
-        self.ids.exp_txt.text = str(int(value))
         
     # Callback for the checkbox 
-    def autoExposure_click(self, instance, value): 
-        if value == True:
+    def autoExposure_click(self, button): 
+        if self.autoExposure == False:
             #auto calibrate and disable exposure input
             camWrap.setAutoExposure(True)
             self.ids.exp_slider.disabled = True
             self.ids.exp_up.disabled = True
             self.ids.exp_down.disabled = True
             # self.ids.exp_range_select.disabled = True
+            button.opacity = 0.5
+            button.text = "Auto ON"
+            self.autoExposure = True
         else: 
             #update the GUI values 
             self.exposure = int(camWrap.get_exposure()/1000)  #in milliseconds 
@@ -200,6 +184,9 @@ class ConfigScreen(Screen):
             # else:
             #     self.exposureRange_change(self.exp_range_values[1])
             camWrap.setAutoExposure(False)
+            button.opacity = 1.0
+            button.text = "Auto OFF"
+            self.autoExposure = False
 
     #######################  GAIN GUI CONTROLS ####################
 
@@ -215,17 +202,19 @@ class ConfigScreen(Screen):
             self.ids.gain_txt.text = str(self.gain)
             self.ids.gain_slider.value = self.gain
 
-    def updateGainSlider(self, value):
+    def updateGainSlider(self, instance, value):
         self.gain = value
-        self.ids.gain_txt.text = str(int(value))
 
-    def autoGain_click(self, instance, value): 
-        if value == True:
+    def autoGain_click(self, button): 
+        if self.autoGain == False:
             #auto calibrate and disable exposure input
             camWrap.setAutoGain(True)
             self.ids.gain_slider.disabled = True
             self.ids.gain_up.disabled = True
             self.ids.gain_down.disabled = True
+            button.opacity = 0.5
+            button.text = 'Auto ON'
+            self.autoGain = True
         else: 
             #update the GUI values 
             self.gain = camWrap.get_gain()  #in milliseconds 
@@ -234,14 +223,17 @@ class ConfigScreen(Screen):
             self.ids.gain_up.disabled = False
             self.ids.gain_down.disabled = False
             camWrap.setAutoGain(False)
+            button.opacity = 1.0
+            button.text = 'Auto OFF'
+            self.autoGain = False
 
 
     #######################  GENERAL CONTROLS  ####################
     # Take the config values and send them to the camera
     def backToCamera_release(self):
-        if self.ids.gain_auto.active == False: #if not auto exposure 
+        if self.autoGain == False: #if not auto exposure 
             camWrap.set_gain(self.gain)
-        if self.ids.exp_auto.active == False:  #it not auto gain
+        if self.autoExposure == False:  #it not auto gain
             camWrap.set_exposure(self.exposure)
         
         self.manager.current = 'camera'  #switch screen
@@ -257,7 +249,7 @@ class PmiruApp(App):
 
         Window.size = (wSizeX, wSizeY)
         Window.bind(on_resize=self.check_resize)
-        # Window.fullscreen = True #Maximizes Kivy Window
+        Window.fullscreen = maximizeStart #Maximizes Kivy Window
 
         return sm
 
@@ -302,10 +294,19 @@ def takeHyperCube():
 
 
 if __name__ == "__main__":
-    
+    #Check cmd line arguments
+    parser = argparse.ArgumentParser(prog="pmiru")
+    parser.add_argument("-m", help="full screen start", action='store_true', required=False)
+    args = parser.parse_args()
+    if args.m :
+        maximizeStart = True
+
+    #Start camera and read avalaible captures
     camWrap = camWrap() 
+    camType = camWrap.camType
     cubeFolders, cubeFiles = camWrap.getCubesList()
 
+    #In case you want to use the filter wheel
     if enableWheel:
         wheel=WheelControl()
         #wheel.startINDIServer()  #TODO if this is not done connected function just loops 

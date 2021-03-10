@@ -84,7 +84,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('2825:0157') != -1:
             print ("Baumer camera found.")
-            return 'baumer'  #zwo found
+            return 'baumer'  #baumer found
 
 
         print ("ERROR: No Baumer or ZWO cameras found")
@@ -114,12 +114,8 @@ class camWrap():
         self.cam.setExposure(value)
 
     def set_gain(self, value):
-        print ("set_gain")
-        print (value)
         if self.camType == 'baumer':
-            value = value / 10.0 #map value to baumer range [0,10]
-            print (value)
-            
+            value = value / 10.0  #map value to baumer range [0,10]   
         self.cam.setGain(value)
 
     def setAutoExposure(self, value):
@@ -127,6 +123,9 @@ class camWrap():
 
     def setAutoGain(self, value):
         self.cam.setAutoGain(value)
+
+    def getMinMaxGain(self):
+        return self.cam.getMinMaxGain()
 
     def captureLoop(self, value):        
         if value == False:

@@ -77,8 +77,14 @@ class asioCam():
         print ("Auto Gain value: " + str(self.gain))
         print ("Auto Exposure value: " + str(self.exposure))
         
-
         return True 
+
+    # gets the max and min gain 
+    def getMinMaxGain(self):
+        controls = self.camera.get_controls()
+        #value = self.camera.get_control_value(asi.ASI_AUTO_MAX_GAIN, controls['Gain'])
+        # controls[asi.ASI_AUTO_MAX_GAIN]
+        return [controls['AutoExpMaxGain']['MinValue'],controls['AutoExpMaxGain']['MaxValue']  ]
 
     # sets auto exposure and calulates the right settings for it 
     def setAutoExposure(self, value):
@@ -90,8 +96,8 @@ class asioCam():
 
     def setAutoGain(self, value):
         controls = self.camera.get_controls()
-        self.camera.set_control_value(asi.ASI_EXPOSURE,
-                                controls['Exposure']['DefaultValue'],
+        self.camera.set_control_value(asi.ASI_GAIN,
+                                controls['Gain']['DefaultValue'],
                                 auto=value)
         self.autoGain = value
     

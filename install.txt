@@ -21,7 +21,12 @@ INSTALLL KIVY
 First install Kivy dependencies: 
 'sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev'
 then install kivy using pip3 
-python3 -m pip install kivy[base] kivy_examples
+python3 -m pip install kivy[base] 
+
+Add the following to '~/.bashrc' to disable Kivy default arguments:
+# disable kivy command line for pmiru
+KIVY_NO_ARGS=1
+export KIVY_NO_ARGS
 
 INSTALL ZWOASI 
 pip3 install zwoasi
@@ -53,7 +58,29 @@ Before the 'exit 0', add this:
 
 TOUCH SCREEN INSTALL
 These are the instructions for the touch screen install
-https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install-2
+Use the following comands:  (taken from: )https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install-2
+cd ~
+sudo pip3 install --upgrade adafruit-python-shell click==7.0
+git clone https://github.com/adafruit/Raspberry-Pi-Installer-Scripts.git
+cd Raspberry-Pi-Installer-Scripts
+
+Run Adafruit configuration script, with:
+sudo python3 adafruit-pitft.py 
+and select the following options:
+[4] [90 degrees] [No] [Yes] and DO NOT reboot. 
+
+Also, Kivy needs special instructions to control the touch screen. 
+Edit ~/.kivy/config.ini and add the following lines in the [input] section:
+
+[input]
+mouse = mouse
+mtdev_%(name)s = probesysfs,provider=mtdev
+hid_%(name)s = probesysfs,provider=hidinput,param=rotation=90,param=invert_y=1
+
+(note. the rotation of the screen must be the same as indicated in Raspbery script) 
+
+Also in the [graphics] section modify width and height parameters to 320, 240 respectevely.
+And the REBOOT !!
 
 
 FINALLY 
@@ -62,6 +89,8 @@ python3 pmiru.py
 
 
 OPTIONAL 
-Switch beteen python2 to python3. So when you excecute python you use python3:
+Switch beteen python2 to python3. 
+So when you call python you use python 3. 
+
 
 

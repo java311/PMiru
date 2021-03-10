@@ -2,71 +2,63 @@
 
 <CameraScreen>:
     FloatLayout: 
-        Scatter:
+        Image:
+            id: cam_img
             size: root.size
-            auto_bring_to_front: False
-            do_translation: False
-            do_rotation: False
-            Image:
-                id: cam_img
-                size: root.size
         ActionButton:
             icon: "camera_red.png"
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"x": 0.5, 'down':0.5}
             on_release: root.shoot_release()
         ActionButton:
             icon: "config_red.png"
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"right": 1, 'top':1}
-            # on_release: root.manager.current = 'config'
             on_release: root.screen_change('config')
         ActionButton:
             icon: "flower_red.png"
-            size_hint: 0.1, 0.1
-            pos_hint: {"right": 0.1, 'top':1}
-            # on_release: root.manager.current = 'viewer'
+            size_hint: 0.15, 0.15
+            pos_hint: {"right": 0.15, 'top':1}
             on_release: root.screen_change('viewer')
+        ActionButton:
+            icon: 'left_red.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0, 'down':0.9}
+            on_release: root.exit_press()
 
 <ViewerScreen>:
     FloatLayout:
-        Scatter:
-            id: viewer_scatter
-            size: viewer_img.size
-            auto_bring_to_front: False
-            do_translation: False
-            do_rotation: False
-            Image:
-                id: viewer_img
-                size: root.size
+        Image:
+            id: viewer_img
+            size: root.size
         ActionButton:
             text: 'Back'
             icon: 'left_red.png'
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"left": 0, 'top':0.5}
             on_release: root.viewerBack_release()
         ActionButton:
             text: 'Next'
             icon: 'right_red.png'
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"right":1, 'top':0.5}
             on_release: root.viewerNext_release()
         ActionButton:
             text: 'Back to Camera'
             icon: 'camera_red.png'
-            size_hint: 0.1, 0.1
-            pos_hint: {"right":1, 'top':0.1}
+            size_hint: 0.15, 0.15
+            pos_hint: {"right":1, 'top':0.15}
             on_release: root.manager.current = 'camera'
         ActionButton:
             text: 'Layer Down'
             icon: 'layers_red_down.png'
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"x": 0.5, 'down':0.5}
             on_release: root.viewerLayerDown_release()
         ActionButton:
             text: 'Layer Up'
             icon: 'layers_red_up.png'
-            size_hint: 0.1, 0.1
+            size_hint: 0.15, 0.15
             pos_hint: {"x":0.5, 'top':1}
             on_release: root.viewerLayerUp_release()
         Label:
@@ -75,7 +67,7 @@
             color: 1, 0, 0, 1 #red
             size_hint: 0.1, 0.1
             font_size: '20sp'
-            pos_hint: {"x":0.6, 'top':1}
+            pos_hint: {"x":0.8, 'top':1}
         Label:
             id: cube_txt
             text: '0/0'
@@ -88,69 +80,58 @@
 <ConfigScreen>:
     BoxLayout:
         orientation: 'vertical'
+        font_size: '25dp'
         BoxLayout:
             orientation: 'horizontal'
             Label:
                 color: 1, 0, 0, 1 #red
                 text: 'Exposure'
+                font_size: '25dp'
             TextInput: 
                 id: exp_txt
+                text: str(int(exp_slider.value))
+                font_size: '25dp'
+                color: 1, 0, 0, 1 #red
                 disabled: True
                 multiline: False
-                text: '50'
-                # hint_text:'Exposure'
-                # pos_hint: {'center_x': 0.5, 'center_y': 0.705} 
-                # size_hint: 0.95, 0.5
-                # on_text: root.exposureText_change(self.text) \
+                value: 5
             Label:
                 id: exp_range_label
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
                 text: 'ms'
             Button:
                 id: exp_up
                 text:'Up'
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
                 disabled: True
                 on_press: root.exposureUp_press()
             Button:
                 id: exp_down
                 text:'Down'
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
                 disabled: True
                 on_press: root.exposureDown_press()
-            CheckBox: 
+            Button: 
                 id: exp_auto
-                active: True
+                text: 'Auto ON'
+                opacity: 0.5
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
-                on_active: root.autoExposure_click(self, self.active) 
-                size_hint_x: .20
-            Label:
-                # text_size: None, None
-                text_size: self.size
-                pos_hint: {'center_y': 0.96}
-                size: self.texture_size
-                color: 1, 0, 0, 1 #red
-                text: 'Auto'
-            # Label:
-            #    text: 'Range:'
+                # on_active: root.autoExposure_click(self, self.active) 
+                on_press: root.autoExposure_click(self)
+            #Label:
+            #    text_size: None, None
+            #    text_size: self.size
+            #    font_size: '25dp'
+            #    pos_hint: {'center_y': 0.9}
+            #    size: self.texture_size
             #    color: 1, 0, 0, 1 #red
-            # Spinner:
-            #    id: exp_range_select
-            #    size_hint: None, None
-            #    size: 100, 44
-            #    # pos_hint: {'center': (.5, .5)}
-            #    color: 1, 0, 0, 1 #red
-            #    pos_hint: {'center_y': .5}
-            #    text: '1~100ms'
-            #    values: '1~100ms', '100~1000ms'
-            #    on_text:
-            #        root.exposureRange_change(self.text)
+            #    text: 'Auto'
         BoxLayout:
             orientation: 'horizontal'
-            #Label:
-            #    id: exp_slider_label_min
-            #    color: 1, 0, 0, 1 #red
-            #    text: '1'
             Slider:
                 id: exp_slider
                 disabled: True
@@ -160,18 +141,17 @@
                 value: 50
                 orientation: 'horizontal'
                 # on_value:label2.text = str(int(self.value))
-                on_value: root.updateExpSlider(self.value)
-            #Label:
-            #    id: exp_slider_label_max
-            #    color: 1, 0, 0, 1 #red
-            #    text: '1000'
+                on_value: root.updateExpSlider(self, self.value)
         BoxLayout:
             orientation: 'horizontal'
             Label:
                 color: 1, 0, 0, 1 #red
                 text: 'Gain'
+                font_size: '25dp'
             TextInput: 
                 id: gain_txt
+                text: str(int(gain_slider.value))
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
                 disabled: True
                 multiline: False
@@ -179,27 +159,33 @@
             Button:
                 id: gain_up
                 text:'Up'
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
                 disabled: True
-                on_press: root.gainUp_press()
+                on_release: root.gainUp_press()
             Button:
                 id: gain_down
                 text:'Down'
+                font_size: '25dp'
+                color: 1, 0, 0, 1 #red
                 disabled: True
-                on_press: root.gainDown_press()
-            CheckBox: 
+                on_release: root.gainDown_press()
+            Button: 
                 id: gain_auto
-                active: True
+                text: 'Auto ON'
+                opacity: 0.5
+                font_size: '25dp'
                 color: 1, 0, 0, 1 #red
-                on_active: root.autoGain_click(self, self.active) 
-                size_hint_x: .20
-            Label:
-                # text_size: None, None
-                text_size: self.size
-                pos_hint: {'center_y': 0.96}
-                size: self.texture_size
-                color: 1, 0, 0, 1 #red
-                text: 'Auto'
+                # on_active: root.autoGain_click(self, self.active) 
+                on_press: root.autoGain_click(self)
+            #Label:
+            #    text_size: None, None
+            #    text_size: self.size
+            #    font_size: '25dp'
+            #    pos_hint: {'center_y': 0.90}
+            #    size: self.texture_size
+            #    color: 1, 0, 0, 1 #red
+            #    text: 'Auto'
         BoxLayout:
             orientation: 'horizontal'
             Slider:
@@ -211,16 +197,18 @@
                 value: 3
                 orientation: 'horizontal'
                 # on_value:label2.text = str(int(self.value))
-                on_value: root.updateGainSlider(self.value)     
+                on_value: root.updateGainSlider(self, self.value)     
 
         BoxLayout:
             orientation: 'horizontal'
             ActionButton:
                 text: 'Back to menu'
                 icon: 'left_red.png'
+                size_hint: 0.7, 0.7
                 on_release: root.backToCamera_release()
             BoxLayout:
                 orientation: 'horizontal'
             ActionButton:
                 text: 'My settings button'
                 icon: 'right_red.png'
+                size_hint: 0.7, 0.7
