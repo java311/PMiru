@@ -8,6 +8,7 @@ import argparse
 cam = None   #ZWO,Baumer camera control
 camType = 'baumer' 
 wheel = None  #ZWO wheel control
+leds = None #LED control object
 enableWheel = False
 cubeIndex = 0
 layerIndex = 0
@@ -35,6 +36,7 @@ from kivy.core.window import Window
 if enableWheel:
     from control.wheel_control import WheelControl   #class to control the wheel
 from control.camWrap import camWrap              #class to wrap ZWO and Baumer API cameras
+from control.ledControl import ledControl 
 
 class FirstScreen(Screen):
     def __init__(self, **kwargs):
@@ -281,6 +283,10 @@ def takeHyperCube():
         if wheel is not None:
             wheel.rotateRight()
         time.sleep(1)  #wait for the rotation to finish  #TODO make it a GUI option
+        
+        #change lights
+        leds.nextColorON()
+
         if camType == 'zwo':
             fname = "img_" + format(counter, '02d') + ".jpg"
         else:
@@ -288,6 +294,8 @@ def takeHyperCube():
         camWrap.takeSingleShoot(path=folder, filename=fname)
         nSlots = nSlots -1
         counter = counter + 1
+
+        leds.nextColorOFF()
 
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
@@ -305,6 +313,9 @@ if __name__ == "__main__":
     camWrap = camWrap() 
     camType = camWrap.camType
     cubeFolders, cubeFiles = camWrap.getCubesList()
+
+    #Init LED control object
+    leds = ledControl() 
 
     #In case you want to use the filter wheel
     if enableWheel:

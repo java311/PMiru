@@ -82,11 +82,46 @@ hid_%(name)s = probesysfs,provider=hidinput,param=rotation=90,param=invert_y=1
 Also in the [graphics] section modify width and height parameters to 320, 240 respectevely.
 And the REBOOT !!
 
+TOUCHSCREEN PINS 
+The touchscreen must be connected to the Raspberyy suing SPI0, plus 3.3V, 5V, ground. 
+And other GPIO pins with unknown usability. Here are the PINS: 
+(pin number are normal PIN numbers not GPIO)
+5 Volt - PIN 2
+3.3 Volt - PIN 17
+SPI pins, GND and extras  - PINs 19, 20, 21, 22, 23, 24
+
+AMPERKA PINs (light control)
+Since we are using SPI0 for the touchscreen, the light control boards must be connected using 
+SPI1. But first this feature must be enabled by editing '/boot/config.txt' and add the follwoing line:
+
+dtoverlay=spi1-3cs
+
+And then reboot. 
+To check if SPI is activated excecute: 'ls /dev/spi*'. The command output must be: 
+
+pi@raspberrypi:~/PMiru $ ls /dev/spi*
+/dev/spidev1.0  /dev/spidev1.1  /dev/spidev1.2
+
+Then connect Amperka boards using the following configuration: 
+Amperka            -      Raspberry
+pulse icon pin     -      SLCK      PIN 40
+Ground             -      GND       PIN 39
+DI                 -      MOSI SPI1 PIN 38
+CS                 -      SPI CE2   PIN 36
+pin between GND
+&                  -      5V        PIN 2
+Clock (5V)
+
+(the boards had been hacked to work with 3.3Volts) 
+with the purple cables soldered on each of the boards. 
+
+To control the 10 colors, it is necessary to have two Amperka boards connected to each other using SPI.
+Just use jumper camples to connect the SPI output to the SPI input with the correspondant PINs on the other board.
+(Do not forget to connect the 5V hacked PIN)
 
 FINALLY 
-Go to the folder where P-Miru is and excecute it using this command:
-python3 pmiru.py
-
+Go to the folder where P-Miru is and excecute it using this command: 
+'python3 pmiru.py -m' to star it maximized or without options for normal startup
 
 OPTIONAL 
 Switch beteen python2 to python3. 
