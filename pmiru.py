@@ -264,8 +264,6 @@ class PmiruApp(App):
         global wSizeX, wSizeY
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
-        
-        
 
 # Rotate, change light and take picture
 def takeHyperCube():
@@ -284,19 +282,19 @@ def takeHyperCube():
             wheel.rotateRight()
         time.sleep(1)  #wait for the rotation to finish  #TODO make it a GUI option
         
-        #change lights
-        leds.nextColorON()
+        leds.nextColorON()  #Next LED color ON
 
         if camType == 'zwo':
-            fname = "img_" + format(counter, '02d') + ".jpg"
+            fname = "img_" + format(counter, '02d') + ".tiff"
         else:
             fname = "img_" + format(counter, '02d') + ".tiff"
         camWrap.takeSingleShoot(path=folder, filename=fname)
         nSlots = nSlots -1
         counter = counter + 1
 
-        leds.nextColorOFF()
-
+        leds.nextColorOFF()  #Next LED color OFF
+    
+    camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
 

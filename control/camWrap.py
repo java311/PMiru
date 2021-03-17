@@ -1,5 +1,6 @@
 # Python imports
 import subprocess
+import cv2
 import sys
 import os
 from sys import platform
@@ -192,6 +193,30 @@ class camWrap():
         else:
             self.rootPath = rootPath
 
+    # If ZWO, then rotate the captured images 
+    def rotateImageFiles(self, path): 
+        if self.camType == 'zwo':
+            print ('Rotating image FILES taken with ZWO cameras. This will be slow....')
+            ff = []
+            for item in self.listdir_fullpath(path):  #openf jpg and tiff
+                if os.path.isfile(item) and item.endswith('.jpg'):   
+                    ff.append(item)
+                if os.path.isfile(item) and item.endswith('.tiff'):  
+                    ff.append(item)
+
+            for img_path in ff:
+                print ("Rotating: " + img_path)
+                img = cv2.imread(img_path)  #open image
+                rotated_img = cv2.rotate(img, cv2.ROTATE_180)  #rotate
+                cv2.imwrite(img_path, rotated_img)  #overwrite
+        else:
+            pass
+
+        
+        
+
+    
+    
 
     
 
