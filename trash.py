@@ -56,3 +56,39 @@
 
     #     print('Enabling video mode')
     #     self.camera.start_video_capture()
+
+
+
+    # Rotate, change light and take picture
+def takeHyperCube():
+    camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
+
+    #for each slot, rotate to the right 
+    if wheel is not None:
+        nSlots = wheel.num_slots
+    else:
+        nSlots = 5
+
+    folder = camWrap.getNewFolder()
+    counter = 1
+    while (nSlots > 0):
+        if wheel is not None:
+            wheel.rotateRight()
+        time.sleep(1)  #wait for the rotation to finish  #TODO make it a GUI option
+        
+        leds.nextColorON()  #Next LED color ON
+        motor.moveToNextAngle()
+
+        if camType == 'zwo':
+            fname = "img_" + format(counter, '02d') + ".tiff"
+        else:
+            fname = "img_" + format(counter, '02d') + ".tiff"
+        camWrap.takeSingleShoot(path=folder, filename=fname)
+        nSlots = nSlots -1
+        counter = counter + 1
+
+        leds.nextColorOFF()  #Next LED color OFF
+    
+    # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
+    camWrap.saveControlValues(path=folder, filename="controlValues.txt")
+    camWrap.captureLoop(True)

@@ -227,6 +227,7 @@ class asioCam():
         self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
         print ("Saving frame as: " + str(fullpath))
 
+
     # Saves the control values of the camera in a txt file
     def saveControlValues(self, path, filename):
         settings = self.camera.get_control_values()
