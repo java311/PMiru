@@ -21,8 +21,8 @@
             pos_hint: {"right": 0.15, 'top':1}
             on_release: root.screen_change('viewer')
         ActionButton:
-            icon: 'left_red.png'
-            size_hint: 0.1, 0.1
+            icon: 'exit_red.png'
+            size_hint: 0.13, 0.13
             pos_hint: {"x": 0, 'down':0.9}
             on_release: root.exit_press()
 
@@ -66,7 +66,7 @@
             text: 'Layer 0 of 0'
             color: 1, 0, 0, 1 #red
             size_hint: 0.1, 0.1
-            font_size: '20sp'
+            font_size: '15sp'
             pos_hint: {"x":0.8, 'top':1}
         Label:
             id: cube_txt

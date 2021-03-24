@@ -272,22 +272,23 @@ def takeHyperCube():
 
     folder = camWrap.getNewFolder()
     counter = 1
-    nlayers = leds.nColors * motor.getNumAngles() 
+    nAngles = motor.getNumAngles()
+    nlayers = leds.nColors * nAngles 
     motor.movetoInit()  #moves motor to the first angle of the list
-    for angle in range(0,motor.getNumAngles()): #For each angle
+    for angle in range(0,nAngles): #For each angle
+        motor.moveToAngle(angle) #Move the motor to the next angle
         for color in range(0,leds.nColors): #For each color
             leds.nextColorON()  #Next LED color ON
 
-            fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getCurAngle(), '02d') + ".tiff"
+            fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname)
             leds.nextColorOFF()  #Next LED color OFF
-            motor.moveToNextAngle() #Move the motor to the next angle
             
             progress = int((counter * 100) / nlayers)
             counter = counter + 1
             print ("Progress: " + format(progress, '02d') )
 
-    # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
+    # # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
 
@@ -311,6 +312,7 @@ if __name__ == "__main__":
     #Init Motor control object
     motor = Motor()
     motor.initAngles([-144, -99, -54, -9, 36])
+    motor.movetoInit() 
 
     #In case you want to use the filter wheel
     if enableWheel:
