@@ -2,6 +2,7 @@
 import time
 import cv2
 import sys
+import os
 import argparse
 
 # Global variables 
@@ -9,6 +10,7 @@ cam = None   #ZWO,Baumer camera control
 camType = 'baumer' 
 wheel = None  #ZWO wheel control
 leds = None #LED control object
+motor = None #Motor control object
 enableWheel = False
 cubeIndex = 0
 layerIndex = 0
@@ -79,6 +81,9 @@ class CameraScreen(Screen):
     def exit_press(self):
         sys.exit(0)
 
+    def rotate_press(self):
+        motor.moveToNextAngle()
+
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
         
@@ -97,6 +102,10 @@ class ViewerScreen(Screen):
             return 
         self.ids.layer_txt.text = "Layer " + str(layer_index)  + " of " + str(maxLayers -1)
         self.ids.viewer_img.source = cubeFiles[cube_index][layer_index]
+
+    def imageChangebyFile(self, path, fname):
+        fullpath = path + os.path.sep + fname
+        self.ids.viewer_img.source = fullpath
 
     def viewerBack_release(self):
         global cubeIndex
@@ -268,6 +277,8 @@ class PmiruApp(App):
 
 # Rotate, change light and take picture
 def takeHyperCube():
+    global sm
+
     camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
 
     folder = camWrap.getNewFolder()
@@ -282,6 +293,7 @@ def takeHyperCube():
 
             fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname)
+            sm.get_screen("viewer").imageChangebyFile(path=folder, fname=fname)
             leds.nextColorOFF()  #Next LED color OFF
             
             progress = int((counter * 100) / nlayers)
@@ -316,7 +328,7 @@ if __name__ == "__main__":
 
     #In case you want to use the filter wheel
     if enableWheel:
-        wheel=WheelControl()
+        wheel = WheelControl()
         #wheel.startINDIServer()  #TODO if this is not done connected function just loops 
         wheel.connect("localhost",7624,"ASI EFW",5) 
 

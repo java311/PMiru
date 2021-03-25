@@ -25,6 +25,11 @@
             size_hint: 0.13, 0.13
             pos_hint: {"x": 0, 'down':0.9}
             on_release: root.exit_press()
+        ActionButton:
+            icon: 'rotate_red.png'
+            size_hint: 0.13, 0.13
+            pos_hint: {"right": 1, 'down':0.9}
+            on_release: root.rotate_press()
 
 <ViewerScreen>:
     FloatLayout:

@@ -6,6 +6,7 @@ class Motor():
         self.PIN = gpio_pin
         self.pi = pigpio.pi()
         self.pi.set_mode(self.PIN, pigpio.OUTPUT)
+        self.index = 0
 
     #For Fuataba angle goes from -144 to 144
     def moveTo(self, angle, sleep=0.3):
@@ -25,6 +26,15 @@ class Motor():
     def moveToAngle(self, index, sleep=0.3):
         if index > 0 and index < len(self.angleList): 
             self.moveTo(self.angleList[index])    
+
+    # rotate to next angle 
+    def moveToNextAngle(self, sleep=0.3):
+        self.index =  self.index + 1
+        if self.index == len(self.angleList):
+            self.index = 0
+
+        self.moveTo(self.angleList[self.index])
+        return self.index
     
     def getNumAngles(self):
         return len(self.angleList)
