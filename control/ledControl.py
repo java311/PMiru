@@ -8,8 +8,9 @@ class ledControl():
         self.octo = Octofet(ceNum,nboards,bus=bus)
         self.ch = 0
         self.dev = 0
-        self.nColors = 10 #BY NOW manually set number of colors  
-    
+        self.nColors = 10 # BY NOW manually set number of colors  
+        self.whiteLight = False # Flag to control the white light 
+
     def nextColorON(self):
         self.ch = self.ch + 1
         if self.ch > 7 and self.dev == 0:
@@ -24,6 +25,11 @@ class ledControl():
 
     def nextColorOFF(self):
         self.octo.digital_write(channel=self.ch, value=False,  device=self.dev)
+        time.sleep(0.3)
+
+    def whiteLightShuffle(self):
+        self.whiteLight = not self.whiteLight
+        self.octo.digital_write(channel=2, value=self.whiteLight, device=0)
         time.sleep(0.3)
 
 

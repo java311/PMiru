@@ -4,6 +4,7 @@ import cv2
 import sys
 import os
 import argparse
+import threading
 
 # Global variables 
 cam = None   #ZWO,Baumer camera control
@@ -20,6 +21,7 @@ maximizeStart = False
 wSizeX = 320
 wSizeY = 240
 sm = None #Kivy ScreenManager
+cubeThread = None
 
 # Kivy imports
 from kivy.app import App
@@ -31,7 +33,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.button import Button
 from kivy.uix.image import CoreImage
 from kivy.graphics.texture import Texture
-from kivy.uix.image import Image
+from kivy.core.image import Image 
 from kivy.core.window import Window
 
 # Program python classes 
@@ -46,27 +48,45 @@ class FirstScreen(Screen):
         super(FirstScreen, self).__init__(**kwargs)
 
 class CameraScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(CameraScreen, self).__init__(**kwargs)
+
+        self.refreshByFile = False
+        self.image_path = ""
+        self.image_name = ""
+
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
-        frame = camWrap.get_video_frame()
-        if frame is not None:   #3648, 5472
-            #reshape the frame to the windows size anc convert to RGB 
-            frame = cv2.resize(frame,(wSizeX,wSizeY))
-            frame = cv2.cvtColor(frame,cv2.COLOR_GRAY2RGB) 
-            
-            #create texture buffer for to show the image 
-            image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='rgb')
-            if camWrap.get_img_type() == 8:
-                image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')
-            if camWrap.get_img_type() == 16:
-                image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')  #TODO not tested yet
-            self.ids.cam_img.texture = image_texture
+        if self.refreshByFile: 
+            #  TODO this has a race condition bug, fix it
+            fullpath = self.image_path + os.path.sep + self.image_name
+            self.ids.cam_img.source = fullpath
+            self.refreshByFile = False
         else:
-            # print ("ERROR: No image...")
-            pass
-
+            frame = camWrap.get_video_frame()
+            if frame is not None:   #3648, 5472
+                #reshape the frame to the windows size anc convert to RGB 
+                frame = cv2.resize(frame,(wSizeX,wSizeY))
+                frame = cv2.cvtColor(frame,cv2.COLOR_GRAY2RGB) 
+                
+                #create texture buffer for to show the image 
+                image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='rgb')
+                if camWrap.get_img_type() == 8:
+                    image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')
+                if camWrap.get_img_type() == 16:
+                    image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')  #TODO not tested yet
+                self.ids.cam_img.texture = image_texture
+            else:
+                # print ("ERROR: No image...")  
+                pass
+    
     def shoot_release(self):
-        takeHyperCube()
+        # takeHyperCube()
+        global cubeThread
+
+        cubeThread = threading.Thread(target=takeHyperCube)
+        cubeThread.start()
         print ("Hypercube captured")
 
     def screen_change(self, screen):
@@ -83,6 +103,19 @@ class CameraScreen(Screen):
 
     def rotate_press(self):
         motor.moveToNextAngle()
+
+    def lighton_press(self):
+        leds.whiteLightShuffle()
+
+    def hide_progress_bar(self, dohide=True):
+        wid = self.ids.prog_bar
+        if hasattr(wid, 'saved_attrs'):
+            if not dohide:
+                wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
+                del wid.saved_attrs
+        elif dohide:
+            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
 
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
@@ -268,7 +301,7 @@ class PmiruApp(App):
     def on_start(self, **kwargs):
         if sm.current == 'camera':
             Clock.schedule_interval(sm.get_screen("camera").cameraRefreshCallback, 0.01)
-
+        sm.get_screen("camera").hide_progress_bar(True)
 
     def check_resize(self, instance, x, y):
         global wSizeX, wSizeY
@@ -278,7 +311,6 @@ class PmiruApp(App):
 # Rotate, change light and take picture
 def takeHyperCube():
     global sm
-
     camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
 
     folder = camWrap.getNewFolder()
@@ -286,6 +318,7 @@ def takeHyperCube():
     nAngles = motor.getNumAngles()
     nlayers = leds.nColors * nAngles 
     motor.movetoInit()  #moves motor to the first angle of the list
+    sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
     for angle in range(0,nAngles): #For each angle
         motor.moveToAngle(angle) #Move the motor to the next angle
         for color in range(0,leds.nColors): #For each color
@@ -293,16 +326,20 @@ def takeHyperCube():
 
             fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname)
-            sm.get_screen("viewer").imageChangebyFile(path=folder, fname=fname)
+            sm.get_screen("camera").image_name = fname
+            sm.get_screen("camera").image_path = folder
+            sm.get_screen("camera").refreshByFile = True
             leds.nextColorOFF()  #Next LED color OFF
             
             progress = int((counter * 100) / nlayers)
             counter = counter + 1
             print ("Progress: " + format(progress, '02d') )
+            sm.get_screen("camera").ids.prog_bar.value = progress
 
     # # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
+    sm.get_screen("camera").hide_progress_bar(True) #hide progress bar
 
 
 if __name__ == "__main__":

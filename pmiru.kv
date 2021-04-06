@@ -8,7 +8,7 @@
         ActionButton:
             icon: "camera_red.png"
             size_hint: 0.15, 0.15
-            pos_hint: {"x": 0.5, 'down':0.5}
+            pos_hint: {"x": 0.40, 'down':0.5}
             on_release: root.shoot_release()
         ActionButton:
             icon: "config_red.png"
@@ -27,9 +27,24 @@
             on_release: root.exit_press()
         ActionButton:
             icon: 'rotate_red.png'
-            size_hint: 0.13, 0.13
+            size_hint: 0.12, 0.12
             pos_hint: {"right": 1, 'down':0.9}
             on_release: root.rotate_press()
+        ActionButton:
+            icon: 'led_red.png'
+            size_hint: 0.13, 0.13
+            pos_hint: {"right": 1, 'top':0.3}
+            on_release: root.lighton_press()
+        ProgressBar:
+            id: prog_bar
+            min: 0 
+            max: 100
+            value: 50
+            size_hint: 0.7, 0.1
+            pos_hint: {"right": 0.85, 'top':0.25}
+            
+
+
 
 <ViewerScreen>:
     FloatLayout:
