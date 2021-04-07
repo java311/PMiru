@@ -24,7 +24,7 @@ cubeThread = None #thread object to run capture process
 # PROGRAM CONTROL FLAGS 
 enableWheel = False  # Enables the use of the wheel (deprecated)
 maximizeStart = False # Starts kivy maximized or not 
-stackedTiffs = False # Created stacked tiff files by LED color
+stackedTiffs = True # Created stacked tiff files by LED color
 rotateImages = False # Rotates images after capture
 
 # Kivy imports
@@ -60,6 +60,7 @@ class CameraScreen(Screen):
         self.image_path = ""
         self.image_name = ""
         self._lock = threading.Lock()
+        self.lightON = False
 
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
@@ -108,7 +109,15 @@ class CameraScreen(Screen):
         motor.moveToNextAngle()
 
     def lighton_press(self):
-        leds.whiteLightShuffle()
+        # leds.lightShuffle() #by default shuffle white light LED
+
+        # This version shuffles all the lights in order
+        if self.lightON == True: 
+            leds.nextColorOFF()
+            self.lightON = False
+        else:
+            leds.nextColorON()
+            self.lightON = True
 
     def hide_progress_bar(self, dohide=True):
         wid = self.ids.prog_bar
@@ -324,7 +333,7 @@ def takeHyperCube():
     sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
     sm.get_screen("camera").ids.prog_bar.value = 0
     sm.get_screen("camera").ids.shoot_btn.disabled = True
-
+    leds.initIndices()
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
         for color in range(0,leds.nColors): # For each color
