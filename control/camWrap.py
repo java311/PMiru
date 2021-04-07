@@ -5,6 +5,7 @@ import sys
 import os
 from sys import platform
 from datetime import datetime
+import tifffile
 
 # Program imports
 from control.asioCam import asioCam              #class to control the ZWO camera
@@ -211,6 +212,27 @@ class camWrap():
                 cv2.imwrite(img_path, rotated_img)  #overwrite
         else:
             pass
+
+    # Builds a TIFF stack for each of the LED color
+    def buildTiffStacks(self, path, leds, prog_bar):
+        print ('Building the TIFF stacked files by LED color. This will be slow....')
+        ff = []
+        for item in self.listdir_fullpath(path):  #open ONLY tiff files
+            if os.path.isfile(item) and item.endswith('.tiff'):  
+                ff.append(item)
+
+        stackPath = path + os.path.sep 
+        prog_bar.value = 0
+        for color in range(0,leds.nColors): #For each LED color
+            with tifffile.TiffWriter(stackPath + "stack_" + str(leds.getWavelenght(color)) + "nm_.tiff") as stack:
+                for img_path in ff:
+                    if "_c" + format(color, '02d') in img_path:
+                        print ("Saving file in stack: " + img_path)
+                        stack.save(tifffile.imread(img_path), photometric='minisblack', contiguous=True)
+
+            progress = int((color * 100) / leds.nColors)
+            prog_bar.value = progress
+            print ("Tiff Stack saved: " + stackPath + "stack_" + str(leds.getWavelenght(color)) + "nm_.tiff") 
 
         
         

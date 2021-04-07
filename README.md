@@ -1,7 +1,8 @@
 # P-MIRU
 An Open Source hyperspectral polarized light camera. 
 
-(https://pandao.github.io/editor.md/examples/images/4.jpg)
+![]
+(https://i.ibb.co/4tCZpwy/img-20210320-wa0007.jpg)
 
 ## Install instructions for Raspberry
 

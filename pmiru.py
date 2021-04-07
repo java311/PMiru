@@ -12,16 +12,20 @@ camType = 'baumer'
 wheel = None  #ZWO wheel control
 leds = None #LED control object
 motor = None #Motor control object
-enableWheel = False
-cubeIndex = 0
-layerIndex = 0
-cubeFolders = None
-cubeFiles = None
-maximizeStart = False
+cubeIndex = 0    # cube index for the viewer
+layerIndex = 0   # layer index for the viewer
+cubeFolders = None  # folder list for the viewer
+cubeFiles = None    # file list for the viewer
 wSizeX = 320
 wSizeY = 240
 sm = None #Kivy ScreenManager
-cubeThread = None
+cubeThread = None #thread object to run capture process
+
+# PROGRAM CONTROL FLAGS 
+enableWheel = False  # Enables the use of the wheel (deprecated)
+maximizeStart = False # Starts kivy maximized or not 
+stackedTiffs = True # Created stacked tiff files by LED color
+rotateImages = False # Rotates images after capture
 
 # Kivy imports
 from kivy.app import App
@@ -89,14 +93,6 @@ class CameraScreen(Screen):
         cubeThread.start()
         print ("Hypercube captured")
 
-    def screen_change(self, screen):
-        if (screen == 'viewer'):
-            global cubeFolders
-            global cubeFiles
-            cubeFolders, cubeFiles = camWrap.getCubesList()
-            sm.get_screen("viewer").imageChange(cubeIndex, 0)
-
-        self.manager.current = screen
 
     def exit_press(self):
         sys.exit(0)
@@ -319,6 +315,7 @@ def takeHyperCube():
     nlayers = leds.nColors * nAngles 
     motor.movetoInit()  #moves motor to the first angle of the list
     sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
+    sm.get_screen("camera").ids.prog_bar.value = 0
     for angle in range(0,nAngles): #For each angle
         motor.moveToAngle(angle) #Move the motor to the next angle
         for color in range(0,leds.nColors): #For each color
@@ -336,7 +333,11 @@ def takeHyperCube():
             print ("Progress: " + format(progress, '02d') )
             sm.get_screen("camera").ids.prog_bar.value = progress
 
-    # # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
+    if rotateImages == True:
+        camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
+    if stackedTiffs == True:
+        camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar)  #Stacked tiffs by led color 
+
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
     sm.get_screen("camera").hide_progress_bar(True) #hide progress bar
