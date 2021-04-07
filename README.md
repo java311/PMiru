@@ -1,8 +1,7 @@
 # P-MIRU
 An Open Source hyperspectral polarized light camera. 
 
-![]
-(https://i.ibb.co/4tCZpwy/img-20210320-wa0007.jpg)
+![](https://i.ibb.co/4tCZpwy/img-20210320-wa0007.jpg)
 
 ## Install instructions for Raspberry
 
@@ -33,9 +32,11 @@ then install kivy using pip3
 `python3 -m pip install kivy[base] `
 
 Add the following to `~/.bashrc` to disable Kivy default arguments:
-    # disable kivy command line for pmiru
-    KIVY_NO_ARGS=1
-    export KIVY_NO_ARGS
+```
+# disable kivy command line for pmiru
+KIVY_NO_ARGS=1
+export KIVY_NO_ARGS
+```
 
 ### Install ZWO libraries
 `pip3 install zwoasi`
@@ -62,8 +63,9 @@ python3 -m pip install neoapi-1.0.0-py[your python version]-none-any.whl
 ```
 
 Also it is necessary to increase the USB cache size of Raspberry. To do so add this line to `/etc/rc.local`. Before the `exit 0`, add this: 
-
-    sudo sh -c 'echo 1024 > /sys/module/usbcore/parameters/usbfs_memory_mb' &
+```
+sudo sh -c 'echo 1024 > /sys/module/usbcore/parameters/usbfs_memory_mb' &
+```
 
 ### Touch Screen Install
 These are the instructions for the touch screen install
@@ -82,11 +84,12 @@ and select the following options:
 
 Also, Kivy needs special instructions to control the touch screen. 
 Edit `~/.kivy/config.ini` and add the following lines in the [input] section:
-
-    [input]
-    mouse = mouse
-    mtdev_%(name)s = probesysfs,provider=mtdev
-    hid_%(name)s = probesysfs,provider=hidinput,param=rotation=90,param=invert_y=1
+```
+[input]
+mouse = mouse
+mtdev_%(name)s = probesysfs,provider=mtdev
+hid_%(name)s = probesysfs,provider=hidinput,param=rotation=90,param=invert_y=1
+```
 
 (note. the rotation of the screen must be the same as indicated in Raspbery script) 
 
@@ -109,13 +112,14 @@ Since we are using SPI0 for the touchscreen, the light control boards must be co
 First it is necesasry to enable SPI interface using sudo raspi-config. Then after reboot it is necessary
 to enable SP1 too by editing `/boot/config.txt` and add the follwoing line:
 
-     dtoverlay=spi1-3cs
+`dtoverlay=spi1-3cs`
 
 And then reboot. 
 To check if SPI is activated excecute: `ls /dev/spi*`. The command output must be: 
-
-    pi@raspberrypi:~/PMiru $ ls /dev/spi*
-    /dev/spidev1.0  /dev/spidev1.1  /dev/spidev1.2
+```
+pi@raspberrypi:~/PMiru $ ls /dev/spi*
+/dev/spidev1.0  /dev/spidev1.1  /dev/spidev1.2
+```
 
 #### Amperka boards connection pins
 Then connect Amperka boards using the following configuration: 
