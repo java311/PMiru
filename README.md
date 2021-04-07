@@ -16,13 +16,13 @@ use pip3 (it musb be pip3) as:
 `pip3 install opencv-python`
 
 Then install all OpenCV dependencies:
-`sudo apt-get install libcblas-dev  or  libatlas-base-dev`
-`sudo apt-get install libhdf5-dev`
-`sudo apt-get install libhdf5-serial-dev`
-`sudo apt-get install libatlas-base-dev`
-`sudo apt-get install libjasper-dev `
-`sudo apt-get install libqtgui4 `
-`sudo apt-get install libqt4-test`
+    sudo apt-get install libatlas-base-dev
+    sudo apt-get install libhdf5-dev
+    sudo apt-get install libhdf5-serial-dev
+    sudo apt-get install libatlas-base-dev
+    sudo apt-get install libjasper-dev
+    sudo apt-get install libqtgui4 
+    sudo apt-get install libqt4-test
 
 ### Install Kivy
 First install Kivy dependencies: 
