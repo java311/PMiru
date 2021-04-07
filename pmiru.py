@@ -24,7 +24,7 @@ cubeThread = None #thread object to run capture process
 # PROGRAM CONTROL FLAGS 
 enableWheel = False  # Enables the use of the wheel (deprecated)
 maximizeStart = False # Starts kivy maximized or not 
-stackedTiffs = True # Created stacked tiff files by LED color
+stackedTiffs = False # Created stacked tiff files by LED color
 rotateImages = False # Rotates images after capture
 
 # Kivy imports
@@ -59,14 +59,15 @@ class CameraScreen(Screen):
         self.refreshByFile = False
         self.image_path = ""
         self.image_name = ""
+        self._lock = threading.Lock()
 
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
         if self.refreshByFile: 
-            #  TODO this has a race condition bug, fix it
-            fullpath = self.image_path + os.path.sep + self.image_name
-            self.ids.cam_img.source = fullpath
-            self.refreshByFile = False
+            with self._lock:
+                fullpath = self.image_path + os.path.sep + self.image_name
+                if os.path.exists(fullpath):
+                    self.ids.cam_img.source = fullpath
         else:
             frame = camWrap.get_video_frame()
             if frame is not None:   #3648, 5472
@@ -84,15 +85,21 @@ class CameraScreen(Screen):
             else:
                 # print ("ERROR: No image...")  
                 pass
-    
+
     def shoot_release(self):
-        # takeHyperCube()
         global cubeThread
 
         cubeThread = threading.Thread(target=takeHyperCube)
         cubeThread.start()
-        print ("Hypercube captured")
 
+    def screen_change(self, screen):
+        if (screen == 'viewer'):
+            global cubeFolders
+            global cubeFiles
+            cubeFolders, cubeFiles = camWrap.getCubesList()
+            sm.get_screen("viewer").imageChange(cubeIndex, 0)
+
+        self.manager.current = screen
 
     def exit_press(self):
         sys.exit(0)
@@ -316,22 +323,30 @@ def takeHyperCube():
     motor.movetoInit()  #moves motor to the first angle of the list
     sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
     sm.get_screen("camera").ids.prog_bar.value = 0
-    for angle in range(0,nAngles): #For each angle
-        motor.moveToAngle(angle) #Move the motor to the next angle
-        for color in range(0,leds.nColors): #For each color
-            leds.nextColorON()  #Next LED color ON
+    sm.get_screen("camera").ids.shoot_btn.disabled = True
+
+    for angle in range(0,nAngles): # For each angle
+        motor.moveToAngle(angle) # Move the motor to the next angle
+        for color in range(0,leds.nColors): # For each color
+            leds.nextColorON()  # Next LED color ON
 
             fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname)
-            sm.get_screen("camera").image_name = fname
-            sm.get_screen("camera").image_path = folder
-            sm.get_screen("camera").refreshByFile = True
             leds.nextColorOFF()  #Next LED color OFF
             
             progress = int((counter * 100) / nlayers)
             counter = counter + 1
             print ("Progress: " + format(progress, '02d') )
             sm.get_screen("camera").ids.prog_bar.value = progress
+
+            # Update camera viewer
+            # TODO Only load 1/3 of the images is only a quick fix not a bug solution
+            if color % 3 == 0:
+                sm.get_screen("camera").refreshByFile = True
+                with sm.get_screen("camera")._lock:
+                    sm.get_screen("camera").image_name = fname
+                    sm.get_screen("camera").image_path = folder
+                
 
     if rotateImages == True:
         camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
@@ -340,6 +355,8 @@ def takeHyperCube():
 
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
+    sm.get_screen("camera").ids.shoot_btn.disabled = False  #enable shoot button again
+    sm.get_screen("camera").refreshByFile = False  #go back to normal camera refresh
     sm.get_screen("camera").hide_progress_bar(True) #hide progress bar
 
 
