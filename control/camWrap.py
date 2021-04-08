@@ -141,8 +141,20 @@ class camWrap():
         else:
             pass
 
-    def takeSingleShoot(self, path, filename):
-        self.cam.takeSingleShoot(path=path, filename= filename )
+    def takeSingleShoot(self, path, filename, drops):
+        self.cam.takeSingleShoot(path=path, filename= filename, drops=drops )
+
+    def stopVideoMode(self):
+        if self.camType == 'zwo':
+            self.cam.stopVideoMode()
+        else:
+            pass
+
+    def startVideoMode(self):
+        if self.camType == 'zwo':
+            self.cam.startVideoMode()
+        else:
+            pass
 
     # get the folder path wher to save the hypercube one folder per hypercube 
     def getNewFolder(self, prefix="cube_"):

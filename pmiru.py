@@ -109,15 +109,7 @@ class CameraScreen(Screen):
         motor.moveToNextAngle()
 
     def lighton_press(self):
-        # leds.lightShuffle() #by default shuffle white light LED
-
-        # This version shuffles all the lights in order
-        if self.lightON == True: 
-            leds.nextColorOFF()
-            self.lightON = False
-        else:
-            leds.nextColorON()
-            self.lightON = True
+        leds.rotateLight()
 
     def hide_progress_bar(self, dohide=True):
         wid = self.ids.prog_bar
@@ -333,15 +325,15 @@ def takeHyperCube():
     sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
     sm.get_screen("camera").ids.prog_bar.value = 0
     sm.get_screen("camera").ids.shoot_btn.disabled = True
-    leds.initIndices()
+    # camWrap.stopVideoMode()
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
         for color in range(0,leds.nColors): # For each color
-            leds.nextColorON()  # Next LED color ON
-
+            leds.colorOnOff(color, True)  # Turn lights ON
             fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
-            camWrap.takeSingleShoot(path=folder, filename=fname)
-            leds.nextColorOFF()  #Next LED color OFF
+            camWrap.takeSingleShoot(path=folder, filename=fname, drops=3)
+            # time.sleep(5)  #Image save is asynchonus, so lets wait a sec.
+            leds.colorOnOff(color, False)  # Turn lights OFF
             
             progress = int((counter * 100) / nlayers)
             counter = counter + 1
@@ -362,6 +354,7 @@ def takeHyperCube():
     if stackedTiffs == True:
         camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar)  #Stacked tiffs by led color 
 
+    # camWrap.startVideoMode()
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
     sm.get_screen("camera").ids.shoot_btn.disabled = False  #enable shoot button again

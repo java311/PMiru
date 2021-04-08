@@ -6,35 +6,35 @@ class ledControl():
     def __init__(self, ceNum=2, nboards=2, bus=1):
         # inits Octofet controler class. CE number, Number of Amperka boards, bus number (bus SPI0 or SPI1)
         self.octo = Octofet(ceNum,nboards,bus=bus)
-        self.ch = 0  # Channel index 
-        self.dev = 0 # Device index
-        self.nColors = 10 # BY NOW manually set number of colors  
+        self.cindex = 0  # index by color
+        
         # Wavelenghts in building order. 
         #Yellow, Violet, White, Red, Green, Blue, DeepBlue, DeepRed, Inf 740, Inf 850, Inf 940
         self.waveLenghts = [590,400,8000,620,520,460,390,660,740,850,940]  
+        self.colors = [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0], [0,1],[1,1],[2,1] ]
+        self.nColors = len(self.colors)
 
-    # turns the LED following the channel and device order
-    def nextColorON(self):
-        self.octo.digital_write(channel=self.ch, value=True,  device=self.dev)
-        time.sleep(0.3)
+    # Turns ON a led using color index in colors list
+    def colorOnOff(self, color_index, val=True):
+        ch = self.colors[color_index][0] # get channel
+        dev = self.colors[color_index][1] # get device
+        self.octo.digital_write(channel=ch, value=val,  device=dev)
 
-    # turns the current LED off (nextColorON MUST be called before calling this function)
-    def nextColorOFF(self):
-        self.octo.digital_write(channel=self.ch, value=False,  device=self.dev)
-        time.sleep(0.3)
+    # Rotates colors list turning ON and OFF every listed led
+    def rotateLight(self):
+        ch = self.colors[self.cindex][0] # get channel
+        dev = self.colors[self.cindex][1] # get device
 
-        self.ch = self.ch + 1
-        if self.ch > 7 and self.dev == 0:
-            self.ch = 0
-            self.dev = 1
-        if self.ch > 1 and self.dev == 1:
-            self.ch = 0
-            self.dev = 0
+        state = self.octo.get_channel_state(ch, dev)
+        if state == True:  # If ON turn OFF
+            self.octo.digital_write(channel=ch, value=False, device=dev)
+            
+            self.cindex = self.cindex + 1
+            if self.cindex >= self.nColors:
+                self.cindex = 0
 
-    # Init ch and dev indices to their intial values
-    def initIndices(self):
-        self.ch = 0
-        self.dev = 0
+        else:   # If OFF turn ON
+            self.octo.digital_write(channel=ch, value=True, device=dev)
 
     # Giving the index and device numbers shuffles the state of the LED
     def lightShuffle(self, ch=2, dev=0):

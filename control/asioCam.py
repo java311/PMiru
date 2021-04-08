@@ -219,12 +219,27 @@ class asioCam():
         else:
             return None
 
+    def stopVideoMode(self):
+        self.camera.stop_video_capture()
+
+    def startVideoMode(self):
+        self.camera.start_video_capture()
+
     # FAKE method to take still images from the video capture loop
     # bit indicates the image forta 8bit (jpeg) or 16bit (tiff) monochrome 
-    def takeSingleShoot(self, path, filename):
+    def takeSingleShoot(self, path, filename, drops=3):
         fullpath = path + os.path.sep + filename
         print ("Taking frame...")
+        # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+        # self.camera.capture(filename=filename)
+
+        # Drop several frames before taking the GOOD one
+        for i in range(drops):
+            self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+
+        # this is the GOOD one
         self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+
         print ("Saving frame as: " + str(fullpath))
 
 
