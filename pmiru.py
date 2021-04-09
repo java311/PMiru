@@ -72,17 +72,18 @@ class CameraScreen(Screen):
         else:
             frame = camWrap.get_video_frame()
             if frame is not None:   #3648, 5472
-                #reshape the frame to the windows size anc convert to RGB 
+                #reshape the frame to the windows size 
                 frame = cv2.resize(frame,(wSizeX,wSizeY))
-                frame = cv2.cvtColor(frame,cv2.COLOR_GRAY2RGB) 
+                image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='luminance')
                 
                 #create texture buffer for to show the image 
-                image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='rgb')
                 if camWrap.get_img_type() == 8:
-                    image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')
-                if camWrap.get_img_type() == 16:
-                    image_texture.blit_buffer(frame.tostring(), colorfmt='rgb', bufferfmt='ubyte')  #TODO not tested yet
-                self.ids.cam_img.texture = image_texture
+                    image_texture.blit_buffer(frame.tostring(), colorfmt='luminance', bufferfmt='ubyte')
+                    self.ids.cam_img.texture = image_texture
+                else:  #if the image is 16 bit, do nothing (cause Kivy's texture do not support this format
+                    image_texture.blit_buffer(frame.tostring(), colorfmt='luminance', bufferfmt='ushort')
+                    self.ids.cam_img.texture = image_texture
+
             else:
                 # print ("ERROR: No image...")  
                 pass
@@ -348,13 +349,11 @@ def takeHyperCube():
                     sm.get_screen("camera").image_name = fname
                     sm.get_screen("camera").image_path = folder
                 
-
     if rotateImages == True:
         camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
     if stackedTiffs == True:
         camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar)  #Stacked tiffs by led color 
 
-    # camWrap.startVideoMode()
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
     sm.get_screen("camera").ids.shoot_btn.disabled = False  #enable shoot button again

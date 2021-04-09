@@ -37,7 +37,7 @@ class camWrap():
             if platform == 'ubuntu':
                 lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
             
-            if (self.cam.initCam(lib_path=lib_path) == True):
+            if (self.cam.initCam(lib_path=lib_path, imgType=16) == True):
                 self.cam.startCaptureLoop()
             else:
                 print("ERROR: Failed camera init.")
