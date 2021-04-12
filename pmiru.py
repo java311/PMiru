@@ -5,6 +5,7 @@ import sys
 import os
 import argparse
 import threading
+import json
 
 # Global variables 
 cam = None   #ZWO,Baumer camera control
@@ -19,13 +20,15 @@ cubeFiles = None    # file list for the viewer
 wSizeX = 320
 wSizeY = 240
 sm = None #Kivy ScreenManager
-cubeThread = None #thread object to run capture process
+cubeThread = None # thread object to run capture process
+calibThread = None # thread object to run the calibration capture 
 
-# PROGRAM CONTROL FLAGS 
-enableWheel = False  # Enables the use of the wheel (deprecated)
-maximizeStart = False # Starts kivy maximized or not 
-stackedTiffs = True # Created stacked tiff files by LED color
-rotateImages = False # Rotates images after capture
+# PROGRAM CONTROL FLAGS
+# These flags are populated with config.json file
+enableWheel = None  # Enables the use of the wheel (deprecated)
+maximizeStart = None # Starts kivy maximized or not 
+stackedTiffs = None # Created stacked tiff files by LED color
+rotateImages = None # Rotates images after capture
 
 # Kivy imports
 from kivy.app import App
@@ -287,6 +290,14 @@ class ConfigScreen(Screen):
             camWrap.set_exposure(self.exposure)
         
         self.manager.current = 'camera'  #switch screen
+
+    # Function that calibrates the exposure levels of each led
+    def autoCalibration_click(self):
+        global calibThread
+
+        calibThread = threading.Thread(target=runLightCalibration())
+        calibThread.start()
+
     
     
 class PmiruApp(App):
@@ -312,6 +323,62 @@ class PmiruApp(App):
         global wSizeX, wSizeY
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
+
+# NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACEN INFRONT A WHITE SCREEN OR SURFACE
+# Gain/Exposore calibration for each LED of the camera by
+# taking calculating the median illumination value of a completely white surface
+def runLightCalibration():
+    # First use the darkest LED in auto gain/exp to get a reference median value
+    darkIndex = leds.getDarkestIndex()
+    camWrap.captureLoop(True)
+    camWrap.setAutoExposure(True)
+    camWrap.setAutoGain(True)
+    sm.get_screen("camera").refreshByFile = True # Disable camera refresh screen
+    leds.colorOnOff(darkIndex, True)  # Turn on the darkest LED ON
+
+    darkMedian = camWrap.get_median(drops=3, avgs=3)
+
+    darkGain = camWrap.get_gain()  #in milliseconds 
+    darkExp = int(camWrap.get_exposure()/1000)  #in milliseconds
+    leds.colorOnOff(darkIndex, False)  # Turn on the darkest LED OFF
+
+    # Adjust the gain / exp of each LED to approach the reference median value
+    camWrap.setAutoExposure(False)
+    camWrap.setAutoGain(False)
+
+    gainVals = []
+    expVals = []
+    drops = 5
+    avgs = 3
+    for color in range(0,leds.nColors): # For each color
+        if color == darkIndex: #Jump the darkest LED
+           continue
+
+        leds.colorOnOff(color, True)  # Turn on the darkest LED ON
+
+        camWrap.set_gain(darkGain)
+        camWrap.set_exposure(darkExp)
+        
+        median = 0
+        limit = 1000
+        while (darkMedian - median > limit):
+            median = camWrap.get_median(drops=3, avgs=3)
+            print (darkMedian)
+            print (median)
+            print (median - darkMedian)
+
+            camWrap.set_gain(darkGain)
+            camWrap.set_exposure(darkExp)
+
+        leds.colorOnOff(color, False)  # Turn on the darkest LED ON
+        
+
+    # sm.get_screen("camera").refreshByFile = False # Disable camera refresh screen
+
+
+    # Save the calibration results in config json file
+
+
 
 # Rotate, change light and take picture
 def takeHyperCube():
@@ -362,12 +429,21 @@ def takeHyperCube():
 
 
 if __name__ == "__main__":
-    #Check cmd line arguments
-    parser = argparse.ArgumentParser(prog="pmiru")
-    parser.add_argument("-m", help="full screen start", action='store_true', required=False)
-    args = parser.parse_args()
-    if args.m :
-        maximizeStart = True
+    # #Check cmd line arguments
+    # parser = argparse.ArgumentParser(prog="pmiru")
+    # parser.add_argument("-m", help="full screen start", action='store_true', required=False)
+    # args = parser.parse_args()
+    # if args.m :
+    #     maximizeStart = True
+    
+    # Read config json file and initilize config flags and led values
+    with open('config.json') as cfile:
+        cfg = json.load(cfile)
+        for c in cfg['config']:
+            enableWheel = c['wheel']
+            maximizeStart = c['maximized'] 
+            stackedTiffs = c['stacks']
+            rotateImages = c['rotate']
 
     #Start camera and read avalaible captures
     camWrap = camWrap() 
@@ -375,7 +451,7 @@ if __name__ == "__main__":
     cubeFolders, cubeFiles = camWrap.getCubesList()
 
     #Init LED control object
-    leds = ledControl() 
+    leds = ledControl()
 
     #Init Motor control object
     motor = Motor()

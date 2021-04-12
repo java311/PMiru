@@ -1,0 +1,111 @@
+{
+ "config": [
+  {
+   "wheel": false,
+   "maximized": false,
+   "stacks": true,
+   "rotate": false
+  }
+ ],
+ "lights": [
+  {
+   "channel": 0,
+   "device": 0,
+   "wavelenght": 590,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 1,
+   "device": 0,
+   "wavelenght": 400,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 2,
+   "device": 0,
+   "wavelenght": 8000,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 3,
+   "device": 0,
+   "wavelenght": 620,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 4,
+   "device": 0,
+   "wavelenght": 520,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 5,
+   "device": 0,
+   "wavelenght": 460,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 6,
+   "device": 0,
+   "wavelenght": 390,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 7,
+   "device": 0,
+   "wavelenght": 660,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 0,
+   "device": 1,
+   "wavelenght": 740,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 1,
+   "device": 1,
+   "wavelenght": 850,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  },
+  {
+   "channel": 2,
+   "device": 1,
+   "wavelenght": 940,
+   "zwo-exp": 50,
+   "zwo-gain": 4,
+   "baummer-exp": 50,
+   "baummer-gain": 4
+  }
+ ]
+}

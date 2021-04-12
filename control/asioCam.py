@@ -183,6 +183,10 @@ class asioCam():
         self.stop = True
         self.deque.clear()
 
+    # Only clear the frame queue
+    def clearQueue(self):
+        self.deque.clear()
+
     # Main camera capture thread
     def get_frame(self):
         whbi = self.camera.get_roi_format()
@@ -219,6 +223,15 @@ class asioCam():
         else:
             return None
 
+     # Gets the mdian of the frame and drop it
+    def get_median_frame(self):
+        if len(self.deque) > 0 and self.stop == False:
+            frame = self.deque[-1]
+            median = np.median(frame)
+            return median
+        else:
+            return None
+
     def stopVideoMode(self):
         self.camera.stop_video_capture()
 
@@ -241,7 +254,6 @@ class asioCam():
         self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
 
         print ("Saving frame as: " + str(fullpath))
-
 
     # Saves the control values of the camera in a txt file
     def saveControlValues(self, path, filename):

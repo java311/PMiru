@@ -218,8 +218,16 @@
                 value: 3
                 orientation: 'horizontal'
                 # on_value:label2.text = str(int(self.value))
-                on_value: root.updateGainSlider(self, self.value)     
+                on_value: root.updateGainSlider(self, self.value)
 
+        BoxLayout:
+            orientation: 'horizontal'
+            ActionButton:
+                text: 'Auto exp. calibration'
+                # icon: '.png'
+                size_hint: 1.0, 1.0
+                on_release: root.autoCalibration_click()
+            
         BoxLayout:
             orientation: 'horizontal'
             ActionButton:

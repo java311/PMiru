@@ -96,6 +96,34 @@ class camWrap():
     def get_video_frame(self):
         return self.cam.get_video_frame()
 
+    # Gets the median from the camera video feed. 
+    # First drops some frames (for stability) and then returns the averaged median value
+    def get_median(self, drops, avgs):
+        self.cam.clearQueue() #Clear any previous captured frames
+
+        # Drop some frames before taking any measurements
+        while(i <= drops):
+            frame = self.cam.get_video_frame()
+            if frame is None:
+                print("no video frame")
+                continue
+            i = i + 1
+
+        # Average the median
+        median = 0
+        i = 0
+        while(i <= avgs):
+            m = self.cam.get_median_frame()
+            if m is None:
+                print("no median frame")
+                continue
+            median = median + m # Average medians frames
+            i = i + 1
+        
+        median = median / avgs
+        return median
+
+
     def get_img_type(self):
         return self.cam.imgType
         
@@ -142,7 +170,7 @@ class camWrap():
             pass
 
     def takeSingleShoot(self, path, filename, drops):
-        self.cam.takeSingleShoot(path=path, filename= filename, drops=drops )
+        self.cam.takeSingleShoot(path=path, filename=filename, drops=drops )
 
     def stopVideoMode(self):
         if self.camType == 'zwo':
