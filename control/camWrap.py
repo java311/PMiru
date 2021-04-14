@@ -102,10 +102,11 @@ class camWrap():
         self.cam.clearQueue() #Clear any previous captured frames
 
         # Drop some frames before taking any measurements
+        i=0
         while(i <= drops):
             frame = self.cam.get_video_frame()
             if frame is None:
-                print("no video frame")
+                # print("no video frame")
                 continue
             i = i + 1
 
@@ -115,7 +116,7 @@ class camWrap():
         while(i <= avgs):
             m = self.cam.get_median_frame()
             if m is None:
-                print("no median frame")
+                #print("no median frame")
                 continue
             median = median + m # Average medians frames
             i = i + 1
@@ -123,19 +124,27 @@ class camWrap():
         median = median / avgs
         return median
 
+    def get_median_singleShoot(self, filepath, drops, avgs):
+        if self.camType == 'zwo':
+            return self.cam.getMedianSingleShoot(filepath, drops, avgs)
+        else:
+            pass
+
 
     def get_img_type(self):
         return self.cam.imgType
         
     def get_exposure(self):
         if self.camType == 'zwo':
-            return self.cam.exposure
+            # return self.cam.exposure
+            return self.cam.getExposure()
         else:
             return self.cam.get_exposure()
 
     def get_gain(self):
         if self.camType == 'zwo':
-            return self.cam.gain
+            # return self.cam.gain
+            return self.cam.getGain()
         else:
             r = self.cam.get_gain() #range [0,10]
             return int(r * 10)  #map to 0-100 % value

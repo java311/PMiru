@@ -86,6 +86,18 @@ class asioCam():
         # controls[asi.ASI_AUTO_MAX_GAIN]
         return [controls['AutoExpMaxGain']['MinValue'],controls['AutoExpMaxGain']['MaxValue']  ]
 
+    # gets the exposure value from the camera API
+    def getExposure(self):
+        settings = self.camera.get_control_values()
+        print (settings['Exposure'])
+        return settings['Exposure']
+        
+    # gets the exposure value from the camera API
+    def getGain(self):
+        settings = self.camera.get_control_values()
+        print (settings['Gain'])
+        return settings['Gain']
+
     # sets auto exposure and calulates the right settings for it 
     def setAutoExposure(self, value):
         controls = self.camera.get_controls()
@@ -237,6 +249,26 @@ class asioCam():
 
     def startVideoMode(self):
         self.camera.start_video_capture()
+        
+    def getMedianSingleShoot(self, filePath, drops, avgs):
+        print ("Taking frame...")
+        # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+        # self.camera.capture(filename=filename)
+
+        # Drop several frames before taking the GOOD one
+        for i in range(drops):
+            self.camera.capture_video_frame(filename=filePath, timeout=self.timeout)
+
+        # this is the GOOD one
+        median = 0
+        for i in range(avgs):
+            self.camera.capture_video_frame(filename=filePath, timeout=self.timeout)
+            time.sleep(1)
+            img = cv2.imread(filePath)
+            median = np.median(img)
+        median = median / avgs
+
+        return median
 
     # FAKE method to take still images from the video capture loop
     # bit indicates the image forta 8bit (jpeg) or 16bit (tiff) monochrome 

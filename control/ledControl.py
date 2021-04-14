@@ -28,13 +28,12 @@ class ledControl():
 
         self.darkestIndex = 6 # UV light is the darkest LED
 
-        print (self.colors)
-
     # Turns ON a led using color index in colors list
-    def colorOnOff(self, color_index, val=True):
+    def colorOnOff(self, color_index, val=True, wait=1):
         ch = self.colors[color_index][0] # get channel
         dev = self.colors[color_index][1] # get device
         self.octo.digital_write(channel=ch, value=val,  device=dev)
+        time.sleep(wait)
 
     # Rotates colors list turning ON and OFF every listed led
     def rotateLight(self):
