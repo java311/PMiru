@@ -130,6 +130,12 @@ class camWrap():
         else:
             pass
 
+    def auto_exp_gain_calib(self, with_median, wait, good_frames):
+        if self.camType == 'zwo':
+            return self.cam.autoExposureGainCalib(with_median, wait, good_frames)
+        else:
+            pass
+
 
     def get_img_type(self):
         return self.cam.imgType
@@ -176,7 +182,7 @@ class camWrap():
         if self.camType == 'zwo':
             self.cam.saveControlValues(path=path, filename=filename)
         else:
-            pass
+            pass  #TODO implement this function for Baumer
 
     def takeSingleShoot(self, path, filename, drops):
         self.cam.takeSingleShoot(path=path, filename=filename, drops=drops )

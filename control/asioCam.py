@@ -18,6 +18,7 @@ class asioCam():
     timeout = -1  #infinite timeout
     exposure = None
     gain = None
+    median = None
     stop = False
     autoExp = False
     autoGain = False
@@ -73,7 +74,7 @@ class asioCam():
         print('Enabling video mode')
         self.camera.start_video_capture()        
 
-        self.autoExposureGainCalib()  #calibrate gain and exposure values
+        self.autoExposureGainCalib(with_median=False, wait=0.500, good_frames=5)  #calibrate gain and exposure values
         print ("Auto Gain value: " + str(self.gain))
         print ("Auto Exposure value: " + str(self.exposure))
         
@@ -114,7 +115,7 @@ class asioCam():
         self.autoGain = value
     
     # calculate the correct settings for auto/gain exposure
-    def autoExposureGainCalib(self):
+    def autoExposureGainCalib(self, with_median, wait, good_frames ):
         controls = self.camera.get_controls()
         print('Use minium USB Bandwidth')
         self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
@@ -133,10 +134,14 @@ class asioCam():
         self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
 
         print('Waiting for auto-exposure to compute correct settings ...')
-        sleep_interval = 0.100
+        fp = os.getcwd() + os.path.sep + "fp_calib_.tiff"   #median temporal filepath
+        sleep_interval = wait  #0.100 original value
         df_last = None
         gain_last = None
         exposure_last = None
+        m_threshold = 5
+        median_last = 0
+        min_median = 15
         matches = 0
         while True:
             time.sleep(sleep_interval)
@@ -144,26 +149,52 @@ class asioCam():
             df = self.camera.get_dropped_frames()
             gain = settings['Gain']
             exposure = settings['Exposure']
+            #Hack added to calibrate the camera with median instead of exposure/gain
+            median = 0
+            # if with_median == True:
+            #     median = self.getMedianSingleShoot(fp, 3, 1)
+            
             if df != df_last:
-                print('   Gain {gain:d}  Exposure: {exposure:f} Dropped frames: {df:d}'
+                if with_median == True:
+                    median = self.getMedianSingleShoot(fp, 3, 1)
+                    print('   Gain {gain:d}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:d}'
                     .format(gain=settings['Gain'],
                             exposure=settings['Exposure'],
+                            median=median,
                             df=df))
-                if gain == gain_last and exposure == exposure_last:
-                    matches += 1
+                    if abs(median - median_last) < m_threshold and median > min_median:
+                        matches += 1
+                    else:
+                        matches = 0
+                    if matches >= good_frames: #5 original value
+                        break
                 else:
-                    matches = 0
-                if matches >= 5:
-                    break
+                    print('   Gain {gain:d}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:d}'
+                    .format(gain=settings['Gain'],
+                            exposure=settings['Exposure'],
+                            median=median,
+                            df=df))
+                    if gain == gain_last and exposure == exposure_last:
+                        matches += 1
+                    else:
+                        matches = 0
+                    if matches >= good_frames: #5 original value
+                        break
+    
                 df_last = df
                 gain_last = gain
+                median_last = median
                 exposure_last = exposure
         self.gain = gain_last
         self.exposure = exposure_last
         self.autoExp = True
         self.autoGain = True
+        self.median = median_last
 
-        return [self.exposure, self.gain]
+        print('Use maximum USB Bandwidth')
+        self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MaxValue'])
+
+        return [self.exposure, self.gain, self.median]
 
 
     def setExposure(self, expValue, units='ms'):

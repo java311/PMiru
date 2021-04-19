@@ -26,8 +26,6 @@ class ledControl():
 
             self.nColors = len(cfg['lights'])
 
-        self.darkestIndex = 6 # UV light is the darkest LED
-
     # Turns ON a led using color index in colors list
     def colorOnOff(self, color_index, val=True, wait=1):
         ch = self.colors[color_index][0] # get channel
@@ -61,10 +59,6 @@ class ledControl():
     # Return the wavelenght value of the LED
     def getWavelenght(self, index):
         return self.waveLenghts[index]
-
-    # Return the darkest the LED 
-    def getDarkestIndex(self):
-        return self.darkestIndex
 
 
 

@@ -222,11 +222,38 @@
 
         BoxLayout:
             orientation: 'horizontal'
+            #ActionButton:
+            #    text: 'LEDs Auto Calibration'
+            #    opacity: 0.5
+            #    font_size: '18dp'
+            #    color: 1, 0, 0, 1 #red
+            #    icon: 'led_red.png'
+            #    size_hint: 1.0, 1.0
+            #    on_release: root.autoCalibration_click()
             ActionButton:
-                text: 'Auto exp. calibration'
-                # icon: '.png'
-                size_hint: 1.0, 1.0
                 on_release: root.autoCalibration_click()
+                # size_hint: 0.7, 0.7
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'bt-lr'
+                    Image:
+                        source: 'calib_red.png'
+                        size_hint_x: None
+                        width: 25
+                    Label:
+                        size_hint_x: None
+                        width: 130
+                        text: 'LED Calibration'
+                        font_size: '15dp'
+                        color: 1, 0, 0, 1 #red  
+            Label:
+                id: prog_label
+                #size_hint: 0.3, 0.3
+                font_size: '25dp'
+                color: 1, 0, 0, 1 #red
+                halign: 'right'
+                text: '0 %'
             
         BoxLayout:
             orientation: 'horizontal'
