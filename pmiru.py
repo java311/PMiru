@@ -295,8 +295,9 @@ class ConfigScreen(Screen):
     def autoCalibration_click(self):
         global calibThread
 
-        calibThread = threading.Thread(target=runLightCalibration())
+        calibThread = threading.Thread(target=runLightCalibration)
         calibThread.start()
+
 
     
     
@@ -330,132 +331,48 @@ class PmiruApp(App):
 def runLightCalibration():
     # # First use the all LEDs in auto gain/exp to get a reference median value
     camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
-
-    darkIndex = leds.getDarkestIndex()
     camWrap.setAutoExposure(True)
     camWrap.setAutoGain(True)
+
     sm.get_screen("camera").refreshByFile = True # Disable camera refresh screen
     tmpFilePath = os.getcwd() + os.path.sep + "median_calib.tiff"
     
     nColors = leds.nColors
     autoGainVals = [];  autoExpVals = [];  autoMedVals = []
-    darkGain = 0; darkExp = 0; darkMed = 0
     for color in range(0,nColors): # For each color
     
-        leds.colorOnOff(color, True)  # Turn on the darkest LED ON
+        leds.colorOnOff(color, True)  # Turn on each LED
         
-        autoMedVals.append(camWrap.get_median_singleShoot(tmpFilePath, drops=3, avgs=1))
-        autoExpVals.append(camWrap.get_exposure()/1000.0)    #in miliseconds
-        autoGainVals.append(camWrap.get_gain())              #unitless 
+        egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, good_frames=3) #calibrate with median, return exp,gain,median
+        autoExpVals.append(egm[0]/1000.0)
+        autoGainVals.append(egm[1]/1.0)
+        autoMedVals.append(egm[2])
 
-        if darkIndex == color:
-            darkMed = autoMedVals[-1]
-            darkExp = autoExpVals[-1]
-            darkGafin = autoGainVals  
+        leds.colorOnOff(color, False)  # Turn off each LED
 
-        leds.colorOnOff(color, False)  # Turn on the darkest LED OFF
+        progress = int((color * 100 ) / (nColors-1))  
+        sm.get_screen("config").ids.prog_label.text = str(progress) + " %"  #Update progress in GUI
 
-    # # Adjust the gain / exp of each LED to approach the reference median value (darkIndex)
-    camWrap.setAutoExposure(False)
-    camWrap.setAutoGain(False)
+    #Save obtained auto exposure and gain values in the config JSON file
+    json_cfg = None
+    with open('config.json', 'r') as cfile:   #read JSON
+        json_cfg = json.load(cfile)
 
-    # autoMedVals = [34186.666666666664, 20864.0, 52800.0, 60736.0, 30762.666666666668, 19392.0, 20608.0, 82560.0, 42560.0, 11136.0, 54421.333333333336]
-    # autoExpVals = [17.712, 20.545, 16.488, 12.284, 12.284, 15.799, 18.405, 9.639, 8.555, 11.292, 8.865]
-    # autoGainVals = [196, 204, 200, 196, 196, 212, 220, 212, 208, 216, 212]
-    # darkGain = 220; darkExp = 18.405; darkMed = 20608
-    # darkIndex = leds.getDarkestIndex()
-    # nColors = leds.nColors
+    for color in range(0,nColors):     #edit JSON
+        if camWrap.camType == 'zwo':
+            json_cfg['lights'][color]['zwo-exp'] = autoExpVals[color]
+            json_cfg['lights'][color]['zwo-gain'] = autoGainVals[color]
+        else:
+            pass  #TODO make this function for Baumer....
 
+    with open('config.json', 'w') as cfile:   #save JSON
+        json.dump(json_cfg, cfile, indent=1)
 
-    print (autoMedVals)
-    print (autoExpVals)
-    print (autoGainVals)
+    camWrap.setAutoExposure(True) #Enable auto Gain and auto exposure again
+    camWrap.setAutoGain(True)
 
-    drops = 5
-    avgs = 3
-    cycles = 0
-    threshold = 5
-    # gains = [0]*nColors; exps = [0]*nColors; meds = [0]*nColors; ok = [False]*nColors
-    gains = autoGainVals; exps = autoExpVals; meds = autoMedVals; ok = [False]*nColors
-    g_step = 5; e_step = 3
-    ok[darkIndex] = True
-    while (cycles <= 10):
-
-        for color in range(0,nColors):
-            if ok[color] == True:
-                continue
-
-            if (meds[color] <= meds[darkIndex]): # increase gain / exp
-                exps[color] =  exps[color] + e_step
-                gains[color] =  gains[color] + g_step
-            elif (meds[color] > meds[darkIndex]):  # decrease gain
-                exps[color] =  exps[color] - e_step
-                gains[color] =  gains[color] - g_step
-
-            camWrap.set_gain(gains[color])
-            camWrap.set_exposure(exps[color])
-            leds.colorOnOff(color, True)  # Turn on the darkest LED ON
-
-            meds[color] = camWrap.get_median_singleShoot(tmpFilePath, drops=3, avgs=1)
-            # exp = camWrap.get_exposure()   #in microseconds
-            # gain = camWrap.get_gain()      #unitless
-
-            # adjust the gain and the median
-            # gains[color] = (autoGainVals[darkIndex] * meds[color]) / autoGainVals[darkIndex]
-            # exps[color] = (autoExpVals[darkIndex] * meds[color]) / autoExpVals[darkIndex]
-
-            # check if threshold is reached
-            if abs(meds[color] - meds[darkIndex]) < thrsaeshold:
-                ok[color] = True
-
-            leds.colorOnOff(color, False)  # Turn on the darkest LED ON
-            print (ok)
-            print (meds)
-            print (exps)
-            print (gains)
-
-        #break cycle if all medians are bellow the threshold
-        allOk = True
-        for color in range(0,leds.nColors):
-            if ok[color] == False:
-                allOk = False
-                break
-         
-        if allOk == True:
-            break
-
-        cycles = cycles +1
-        print ('cyclo:' + str(cycles))
-
-
-    # for color in range(0,leds.nColors): # For each color
-    #     if color == darkIndex: #Jump the darkest LED
-    #        continue
-
-    #     leds.colorOnOff(color, True)  # Turn on the darkest LED ON
-
-    #     camWrap.set_gain(darkGain)
-    #     camWrap.set_exposure(darkExp)
-        
-    #     median = 0
-    #     limit = 1000
-    #     while (darkMedian - median > limit):
-    #         median = camWrap.get_median(drops=3, avgs=3)
-    #         print (darkMedian)
-    #         print (median)
-    #         print (median - darkMedian)
-
-    #         camWrap.set_gain(darkGain)
-    #         camWrap.set_exposure(darkExp)
-
-    #     leds.colorOnOff(color, False)  # Turn on the darkest LED ON
-        
-
-    # # sm.get_screen("camera").refreshByFile = False # Disable camera refresh screen
-
-
-    # # Save the calibration results in config json file
-
+    sm.get_screen("camera").refreshByFile = False  #go back to normal camera refresh
+    camWrap.captureLoop(True)
 
 
 # Rotate, change light and take picture
