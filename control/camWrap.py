@@ -155,9 +155,11 @@ class camWrap():
             r = self.cam.get_gain() #range [0,10]
             return int(r * 10)  #map to 0-100 % value
               
+    # Exposure must be given in milliseconds
     def set_exposure(self, value):
         self.cam.setExposure(value)
 
+    # Gain must be given in a range between 0 to 100 (auto converts for Baumer)
     def set_gain(self, value):
         if self.camType == 'baumer':
             value = value / 10.0  #map value to baumer range [0,10]   

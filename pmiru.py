@@ -393,9 +393,11 @@ def takeHyperCube():
         motor.moveToAngle(angle) # Move the motor to the next angle
         for color in range(0,leds.nColors): # For each color
             leds.colorOnOff(color, True)  # Turn lights ON
+            exp_gain = leds.getColorExpGain(camType=camWrap.camType, index=color)
+            camWrap.set_exposure(exp_gain[0])
+            camWrap.set_gain(exp_gain[1])
             fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname, drops=3)
-            # time.sleep(5)  #Image save is asynchonus, so lets wait a sec.
             leds.colorOnOff(color, False)  # Turn lights OFF
             
             progress = int((counter * 100) / nlayers)

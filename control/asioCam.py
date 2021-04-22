@@ -117,8 +117,8 @@ class asioCam():
     # calculate the correct settings for auto/gain exposure
     def autoExposureGainCalib(self, with_median, wait, good_frames ):
         controls = self.camera.get_controls()
-        print('Use minium USB Bandwidth')
-        self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
+        # print('Use minium USB Bandwidth')
+        # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
 
         print('Enabling auto-exposure mode')
         self.camera.set_control_value(asi.ASI_EXPOSURE,
@@ -191,17 +191,19 @@ class asioCam():
         self.autoGain = True
         self.median = median_last
 
-        print('Use maximum USB Bandwidth')
-        self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MaxValue'])
+        # print('Use maximum USB Bandwidth')
+        # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MaxValue'])
 
         return [self.exposure, self.gain, self.median]
 
-
+    # Set the manual exposure value 
     def setExposure(self, expValue, units='ms'):
+        # Disable auto exposure
         self.autoExp = False
         self.setAutoExposure(False)
 
-        if (units == 'ms'):
+        # Converts milliseconsd to microseconds
+        if (units == 'ms'): 
             microsec_exp = int(expValue * 1000)
 
         self.camera.set_control_value(asi.ASI_EXPOSURE, microsec_exp)
@@ -311,7 +313,8 @@ class asioCam():
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
-            self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+            # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+            self.camera.get_video_data(timeout=self.timeout)
 
         # this is the GOOD one
         self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)

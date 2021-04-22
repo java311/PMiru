@@ -18,12 +18,19 @@ class ledControl():
         # Initilize wavelenghts, led conections and indexes
         self.waveLenghts = []
         self.colors = []
+        self.zwo_exp = []
+        self.zwo_gain = []
+        self.baumer_exp = []
+        self.baumer_gain = []
         with open('config.json') as cfile:
             cfg = json.load(cfile)
             for c in cfg['lights']:
                 self.waveLenghts.append(c['wavelenght'])
                 self.colors.append( [ c['channel'] ,  c['device'] ]  )
-
+                self.zwo_exp.append( c['zwo-exp'] )
+                self.zwo_gain.append( c['zwo-gain'] )
+                self.baumer_exp.append( c['baumer-exp'] )
+                self.baumer_gain.append( c['baumer-gain'] )
             self.nColors = len(cfg['lights'])
 
     # Turns ON a led using color index in colors list
@@ -59,6 +66,14 @@ class ledControl():
     # Return the wavelenght value of the LED
     def getWavelenght(self, index):
         return self.waveLenghts[index]
+
+
+    # Return the [exposure, gain] values read from JSON config file
+    def getColorExpGain(self, camType, index):  
+        if camType == 'zwo':  # for zwo
+            return [self.zwo_exp[index], self.zwo_gain[index]]
+        else: # for baumer
+            return [self.baumer_exp[index], self.baumer_gain[index]]
 
 
 
