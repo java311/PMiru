@@ -56,6 +56,13 @@ class asioCam():
 
         self.camera = asi.Camera(self.cam_id)
 
+        # Restore all controls to default values 
+        controls = self.camera.get_controls()
+        for c in controls:
+            self.camera.set_control_value(controls[c]['ControlType'], controls[c]['DefaultValue'])
+
+        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
+
         if imgType == 8:
             self.camera.set_image_type(asi.ASI_IMG_RAW8)
             self.imgType = 8
@@ -74,7 +81,7 @@ class asioCam():
         print('Enabling video mode')
         self.camera.start_video_capture()        
 
-        self.autoExposureGainCalib(with_median=False, wait=0.500, good_frames=5)  #calibrate gain and exposure values
+        self.autoExposureGainCalib(with_median=False, wait=0.500, drops=0, good_frames=5)  #calibrate gain and exposure values
         print ("Auto Gain value: " + str(self.gain))
         print ("Auto Exposure value: " + str(self.exposure))
         
@@ -115,7 +122,7 @@ class asioCam():
         self.autoGain = value
     
     # calculate the correct settings for auto/gain exposure
-    def autoExposureGainCalib(self, with_median, wait, good_frames ):
+    def autoExposureGainCalib(self, with_median, wait, drops, good_frames ):
         controls = self.camera.get_controls()
         # print('Use minium USB Bandwidth')
         # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
@@ -131,7 +138,8 @@ class asioCam():
                                 auto=True)
 
         # Keep max gain to the default but allow exposure to be increased to its maximum value if necessary
-        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
+        # self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
+        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
 
         print('Waiting for auto-exposure to compute correct settings ...')
         fp = os.getcwd() + os.path.sep + "fp_calib_.tiff"   #median temporal filepath
@@ -142,27 +150,25 @@ class asioCam():
         m_threshold = 5
         median_last = 0
         min_median = 15
+        max_median = 200
         matches = 0
+        self.getMedianRawShoot(drops,0)   #drop some frames before taking real values
         while True:
             time.sleep(sleep_interval)
             settings = self.camera.get_control_values()
             df = self.camera.get_dropped_frames()
             gain = settings['Gain']
             exposure = settings['Exposure']
-            #Hack added to calibrate the camera with median instead of exposure/gain
             median = 0
-            # if with_median == True:
-            #     median = self.getMedianSingleShoot(fp, 3, 1)
-            
             if df != df_last:
-                if with_median == True:
-                    median = self.getMedianSingleShoot(fp, 3, 1)
+                if with_median == True: #Hack added to calibrate the camera with median instead of exposure/gain
+                    median = self.getMedianRawShoot(0,1)
                     print('   Gain {gain:d}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:d}'
                     .format(gain=settings['Gain'],
                             exposure=settings['Exposure'],
                             median=median,
                             df=df))
-                    if abs(median - median_last) < m_threshold and median > min_median:
+                    if abs(median - median_last) < m_threshold and median > min_median and median < max_median:
                         matches += 1
                     else:
                         matches = 0
@@ -283,22 +289,23 @@ class asioCam():
     def startVideoMode(self):
         self.camera.start_video_capture()
         
-    def getMedianSingleShoot(self, filePath, drops, avgs):
-        print ("Taking frame...")
-        # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
-        # self.camera.capture(filename=filename)
+    def getMedianRawShoot(self, drops, avgs):
+        print ("Taking raw frame...")
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
-            self.camera.capture_video_frame(filename=filePath, timeout=self.timeout)
+            self.camera.get_video_data(timeout=self.timeout)
+            print ("Frame droped")
+
+        if avgs <= 0:
+            return 0 
 
         # this is the GOOD one
         median = 0
         for i in range(avgs):
-            self.camera.capture_video_frame(filename=filePath, timeout=self.timeout)
-            time.sleep(1)
-            img = cv2.imread(filePath)
-            median = np.median(img)
+            raw = self.camera.get_video_data(timeout=self.timeout)
+            time.sleep(1)  #wait 1 sec
+            median = np.median(raw)  #take median from raw data
         median = median / avgs
 
         return median
@@ -313,7 +320,6 @@ class asioCam():
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
-            # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
             self.camera.get_video_data(timeout=self.timeout)
 
         # this is the GOOD one

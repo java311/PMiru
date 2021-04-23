@@ -329,6 +329,8 @@ class PmiruApp(App):
 # Gain/Exposore calibration for each LED of the camera by
 # taking calculating the median illumination value of a white surface
 def runLightCalibration():
+    global leds 
+    
     # # First use the all LEDs in auto gain/exp to get a reference median value
     camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
     camWrap.setAutoExposure(True)
@@ -343,14 +345,14 @@ def runLightCalibration():
     
         leds.colorOnOff(color, True)  # Turn on each LED
         
-        egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, good_frames=3) #calibrate with median, return exp,gain,median
+        egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, drops=5, good_frames=3) #calibrate with median, return exp,gain,median
         autoExpVals.append(egm[0]/1000.0)
         autoGainVals.append(egm[1]/1.0)
         autoMedVals.append(egm[2])
 
         leds.colorOnOff(color, False)  # Turn off each LED
 
-        progress = int((color * 100 ) / (nColors-1))  
+        progress = int(((color + 1) * 100 ) / (nColors))  
         sm.get_screen("config").ids.prog_label.text = str(progress) + " %"  #Update progress in GUI
 
     #Save obtained auto exposure and gain values in the config JSON file
@@ -367,6 +369,8 @@ def runLightCalibration():
 
     with open('config.json', 'w') as cfile:   #save JSON
         json.dump(json_cfg, cfile, indent=1)
+
+    leds = ledControl()   # Reload the LEDs saved JSON file
 
     camWrap.setAutoExposure(True) #Enable auto Gain and auto exposure again
     camWrap.setAutoGain(True)
