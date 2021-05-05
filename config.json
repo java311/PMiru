@@ -14,8 +14,8 @@
    "wavelenght": 590,
    "zwo-exp": 24.977,
    "zwo-gain": 188.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 185.883,
+   "baumer-gain": 1.0
   },
   {
    "channel": 1,
@@ -23,8 +23,8 @@
    "wavelenght": 400,
    "zwo-exp": 62.887,
    "zwo-gain": 224.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 902.658,
+   "baumer-gain": 1.0
   },
   {
    "channel": 2,
@@ -32,8 +32,8 @@
    "wavelenght": 8000,
    "zwo-exp": 19.742,
    "zwo-gain": 168.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 110.079,
+   "baumer-gain": 1.0
   },
   {
    "channel": 3,
@@ -41,8 +41,8 @@
    "wavelenght": 620,
    "zwo-exp": 7.996,
    "zwo-gain": 172.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 49.84,
+   "baumer-gain": 1.0
   },
   {
    "channel": 4,
@@ -50,8 +50,8 @@
    "wavelenght": 520,
    "zwo-exp": 9.275,
    "zwo-gain": 208.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 115.225,
+   "baumer-gain": 1.0
   },
   {
    "channel": 5,
@@ -59,8 +59,8 @@
    "wavelenght": 460,
    "zwo-exp": 17.355,
    "zwo-gain": 216.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 232.407,
+   "baumer-gain": 1.0
   },
   {
    "channel": 6,
@@ -68,8 +68,8 @@
    "wavelenght": 390,
    "zwo-exp": 1529.175,
    "zwo-gain": 225.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 1000.0,
+   "baumer-gain": 9.98828125
   },
   {
    "channel": 7,
@@ -77,8 +77,8 @@
    "wavelenght": 660,
    "zwo-exp": 10.626,
    "zwo-gain": 160.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 47.937,
+   "baumer-gain": 1.0
   },
   {
    "channel": 0,
@@ -86,8 +86,8 @@
    "wavelenght": 740,
    "zwo-exp": 4.479,
    "zwo-gain": 184.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 50.336,
+   "baumer-gain": 1.0
   },
   {
    "channel": 1,
@@ -95,8 +95,8 @@
    "wavelenght": 850,
    "zwo-exp": 2134.6,
    "zwo-gain": 225.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 1000.0,
+   "baumer-gain": 9.98828125
   },
   {
    "channel": 2,
@@ -104,8 +104,8 @@
    "wavelenght": 940,
    "zwo-exp": 3.956,
    "zwo-gain": 168.0,
-   "baumer-exp": 50,
-   "baumer-gain": 4
+   "baumer-exp": 43.014,
+   "baumer-gain": 1.0
   }
  ]
 }

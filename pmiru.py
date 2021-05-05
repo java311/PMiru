@@ -365,9 +365,11 @@ def runLightCalibration():
             json_cfg['lights'][color]['zwo-exp'] = autoExpVals[color]
             json_cfg['lights'][color]['zwo-gain'] = autoGainVals[color]
         else:
-            pass  #TODO make this function for Baumer....
+            json_cfg['lights'][color]['baumer-exp'] = autoExpVals[color]
+            json_cfg['lights'][color]['baumer-gain'] = autoGainVals[color]
 
     with open('config.json', 'w') as cfile:   #save JSON
+        print ("Dumpig JSON file...")
         json.dump(json_cfg, cfile, indent=1)
 
     leds = ledControl()   # Reload the LEDs saved JSON file
@@ -377,6 +379,7 @@ def runLightCalibration():
 
     sm.get_screen("camera").refreshByFile = False  #go back to normal camera refresh
     camWrap.captureLoop(True)
+    print ("Calibration finished !")
 
 
 # Rotate, change light and take picture
@@ -460,18 +463,18 @@ if __name__ == "__main__":
     motor.movetoInit() 
 
     #In case you want to use the filter wheel
-    if enableWheel:
-        wheel = WheelControl()
-        #wheel.startINDIServer()  #TODO if this is not done connected function just loops 
-        wheel.connect("localhost",7624,"ASI EFW",5) 
+    # if enableWheel:
+    #     wheel = WheelControl()
+    #     #wheel.startINDIServer()  #TODO if this is not done connected function just loops 
+    #     wheel.connect("localhost",7624,"ASI EFW",5) 
 
-        #first ensure conection to the INDIServer
-        print (wheel.isConnected())
-        if (wheel.isConnected() == False):
-            print("ERROR: Cannot connect to INDI server.")
-            sys.exit()
+    #     #first ensure conection to the INDIServer
+    #     print (wheel.isConnected())
+    #     if (wheel.isConnected() == False):
+    #         print("ERROR: Cannot connect to INDI server.")
+    #         sys.exit()
 
-        slot = wheel.getSlot()
-        print ("current slot: " + str(slot))
+    #     slot = wheel.getSlot()
+    #     print ("current slot: " + str(slot))
 
     PmiruApp().run()

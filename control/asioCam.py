@@ -8,6 +8,7 @@ import zwoasi as asi
 from threading import Thread
 from collections import deque
 
+
 # Documentation
 # https://github.com/stevemarple/python-zwoasi/blob/master/zwoasi/__init__.py
 # https://github.com/OpenPHDGuiding/phd2/blob/master/cameras/ASICamera2.h
@@ -122,7 +123,7 @@ class asioCam():
         self.autoGain = value
     
     # calculate the correct settings for auto/gain exposure
-    def autoExposureGainCalib(self, with_median, wait, drops, good_frames ):
+    def autoExposureGainCalib(self, with_median, wait, drops, good_frames, min_median, max_median ):
         controls = self.camera.get_controls()
         # print('Use minium USB Bandwidth')
         # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
@@ -149,8 +150,8 @@ class asioCam():
         exposure_last = None
         m_threshold = 5
         median_last = 0
-        min_median = 15
-        max_median = 200
+        # min_median = 15
+        # max_median = 200
         matches = 0
         self.getMedianRawShoot(drops,0)   #drop some frames before taking real values
         while True:
@@ -290,12 +291,12 @@ class asioCam():
         self.camera.start_video_capture()
         
     def getMedianRawShoot(self, drops, avgs):
-        print ("Taking raw frame...")
+        print ("Taking Median raw frame...")
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
             self.camera.get_video_data(timeout=self.timeout)
-            print ("Frame droped")
+            print ("Median frame droped")
 
         if avgs <= 0:
             return 0 

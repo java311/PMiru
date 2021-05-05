@@ -132,9 +132,9 @@ class camWrap():
 
     def auto_exp_gain_calib(self, with_median, wait, drops, good_frames):
         if self.camType == 'zwo':
-            return self.cam.autoExposureGainCalib(with_median, wait, drops, good_frames)
+            return self.cam.autoExposureGainCalib(with_median, wait, drops, good_frames, min_median = 15, max_median = 200)
         else:
-            pass
+            return self.cam.autoExposureGainCalib(wait, drops=10, good_frames=good_frames, min_median = 10, max_median = 200)
 
 
     def get_img_type(self):
