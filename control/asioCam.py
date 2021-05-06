@@ -82,7 +82,7 @@ class asioCam():
         print('Enabling video mode')
         self.camera.start_video_capture()        
 
-        self.autoExposureGainCalib(with_median=False, wait=0.500, drops=0, good_frames=5)  #calibrate gain and exposure values
+        self.autoExposureGainCalib(with_median=False, wait=0.500, drops=0, good_frames=5, min_median = 15, max_median = 200)  #calibrate gain and exposure values
         print ("Auto Gain value: " + str(self.gain))
         print ("Auto Exposure value: " + str(self.exposure))
         
