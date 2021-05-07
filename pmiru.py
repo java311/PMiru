@@ -106,7 +106,10 @@ class CameraScreen(Screen):
 
         self.manager.current = screen
 
+    # ON Exit pressed
     def exit_press(self):
+        print ("Exit button pressed, (u_u) Bye...")
+        before_destroy()
         sys.exit(0)
 
     def rotate_press(self):
@@ -298,9 +301,6 @@ class ConfigScreen(Screen):
         calibThread = threading.Thread(target=runLightCalibration)
         calibThread.start()
 
-
-    
-    
 class PmiruApp(App):
     def build(self):
         global sm 
@@ -315,15 +315,26 @@ class PmiruApp(App):
 
         return sm
 
+    # Called when the kivy application starts
     def on_start(self, **kwargs):
         if sm.current == 'camera':
             Clock.schedule_interval(sm.get_screen("camera").cameraRefreshCallback, 0.01)
         sm.get_screen("camera").hide_progress_bar(True)
 
+    # Called when kivy application is correctly closed
+    def on_stop(self, **kwargs):
+        print("App window closed, (u_u) Bye...")
+        before_destroy()
+
     def check_resize(self, instance, x, y):
         global wSizeX, wSizeY
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
+
+
+def before_destroy():
+    if leds is not None:
+        leds.lightsOff()
 
 # NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACEN INFRONT A WHITE SCREEN OR SURFACE
 # Gain/Exposore calibration for each LED of the camera by
@@ -477,4 +488,8 @@ if __name__ == "__main__":
     #     slot = wheel.getSlot()
     #     print ("current slot: " + str(slot))
 
-    PmiruApp().run()
+    try:
+        PmiruApp().run()
+    except KeyboardInterrupt:
+        print ("Keyboard Interruption, (u_u) Bye...")
+        before_destroy()

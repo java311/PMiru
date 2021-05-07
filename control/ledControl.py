@@ -67,13 +67,21 @@ class ledControl():
     def getWavelenght(self, index):
         return self.waveLenghts[index]
 
-
     # Return the [exposure, gain] values read from JSON config file
     def getColorExpGain(self, camType, index):  
         if camType == 'zwo':  # for zwo
             return [self.zwo_exp[index], self.zwo_gain[index]]
         else: # for baumer
             return [self.baumer_exp[index], self.baumer_gain[index]]
+
+    # Turn all LEDs OFF (called on closing)
+    def lightsOff(self, wait=1):
+        allOff = [False,False,False,False,False,False,False,False]
+        self.octo.digital_write_all(value=allOff, device=0) # Amperka board 1 ALL OFF
+        self.octo.digital_write_all(value=allOff, device=1) # Amperka board 2 ALL OFF
+        print ("Lights OFF...")
+        time.sleep(wait)
+
 
 
 
