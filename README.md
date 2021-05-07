@@ -106,6 +106,8 @@ And other GPIO pins with unknown usability. Here are the PINS:
 | 3.3 Volt   | PIN 17  |
 | SPI pins GND and extras   | PINs 19, 20, 21, 22, 23, 24  |
 
+![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
+
 ### Amperka board install (light control)
 (Amperka python libraries were modified, so these are include in source code. There is no need to install them)
 Since we are using SPI0 for the touchscreen, the light control boards must be connected using SPI1. 
@@ -130,6 +132,8 @@ Then connect Amperka boards using the following configuration:
 | DI   | MOSI SPI1 PIN 38  |
 | CS   | SPI CE2   PIN 36  |
 | pin between GND and Clock (5V)   | 5V        PIN 2  |
+
+![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
 
 (the boards had been hacked to work with 3.3Volts) 
 with the purple cables soldered on each of the boards. 
