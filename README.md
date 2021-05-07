@@ -9,12 +9,12 @@ These instructions are for a Raspberry fresh install.
 
 ### Install Numpy and Tifffile
 ```
-pip install tifffile
 pip3 install numpy
+pip3 install tifffile
 ```
 
 ### Install OpenCV 3
-use pip3 (it musb be pip3) as: 
+use pip3 (it MUST be pip3) as: 
 `pip3 install opencv-python`
 
 Then install all OpenCV dependencies:
@@ -171,5 +171,5 @@ Go to the folder where P-Miru is and excecute it using this command:
 `python3 pmiru.py -m` to star it maximized or without options for normal startup
 
 ### Optional
-Switch beteen python2 to python3. 
-So when you call python you use python 3. 
+Set python3 as default (so when you call python you call python3 instead of python2)
+https://linuxconfig.org/how-to-change-from-default-to-alternative-python-version-on-debian-linux
