@@ -1,0 +1,12 @@
+#!/bin/bash
+#Launcher for PMIRU. 
+
+cd /
+cd /home/pi/PMiru
+python pmiru.py
+
+#if no arguments start minimized
+#if [ -z "$*" ]; then python pmiru.py; fi
+
+#if -m start maximized
+#if [ $1 == "-m" ]; then python pmiru.py -m; fi
