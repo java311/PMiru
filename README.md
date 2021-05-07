@@ -98,13 +98,14 @@ And then Reboot
 
 #### Touchscreen connection pins
 The touchscreen must be connected to the Raspberyy suing SPI0, plus 3.3V, 5V, ground. 
-And other GPIO pins with unknown usability. Here are the PINS: 
-(pin number are normal PIN numbers not GPIO)
-| Function  | PIN GPIO number |
+Here are the PINs configuration: 
+
+| LCD PIN hole  | Raspbery PIN number |
 | ------------- | ------------- |
 | 5 Volt   | PIN 2  |
 | 3.3 Volt   | PIN 17  |
 | SPI pins GND and extras   | PINs 19, 20, 21, 22, 23, 24  |
+(LCD PIN Numbers are the same as the Raspberry. Just check the orientation of the PIN slot)
 
 ![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
 
@@ -125,7 +126,7 @@ pi@raspberrypi:~/PMiru $ ls /dev/spi*
 
 #### Amperka boards connection pins
 Then connect Amperka boards using the following configuration: 
-| Amperka  | Raspberry GPIO |
+| Amperka  | Raspberry PIN |
 | ------------- | ------------- |
 | pulse icon pin   | SLCK      PIN 40  |
 | Ground   | GND       PIN 39  |
@@ -149,6 +150,12 @@ To do so, use the following commands:
 $ sudo systemctl enable pigpiod.service
 $ sudo shutdown -r now
 ```
+Motor PINs are connected as follows: 
+| Motor  | Amperka Board #2 |
+| ------------- | ------------- |
+| 5 Volt   | Amperka OUT between CS and GND |
+| Ground   | Amperka OUT GND       PIN 39  |
+| Comm    | Raspberry PIN 32 (PWM0)  |
 
 Then check if everything is OK by using 
 `$ sudo systemctl status pigpiod.service`
