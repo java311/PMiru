@@ -7,8 +7,11 @@ An Open Source hyperspectral polarized light camera.
 
 These instructions are for a Raspberry fresh install. 
 
-### Install Numpy
-`pip3 install numpy`
+### Install Numpy and Tifffile
+```
+pip install tifffile
+pip3 install numpy
+```
 
 ### Install OpenCV 3
 use pip3 (it musb be pip3) as: 
@@ -91,10 +94,13 @@ mtdev_%(name)s = probesysfs,provider=mtdev
 hid_%(name)s = probesysfs,provider=hidinput,param=rotation=90,param=invert_y=1
 ```
 
-(note. the rotation of the screen must be the same as indicated in Raspbery script) 
+(NOTE: the rotation of the screen must be the same as indicated in Raspbery script) 
 
 Also in the `[graphics]` section modify width and height parameters to 320, 240 respectevely.
 And then Reboot
+
+(NOTE: If you are going to use the camera without the touch screen, with mouse and keyboard.
+Then the last two must be commented. Otherwise, Kivy will register ghost and random clicks. )
 
 #### Touchscreen connection pins
 The touchscreen must be connected to the Raspberyy suing SPI0, plus 3.3V, 5V, ground. 
@@ -150,15 +156,15 @@ To do so, use the following commands:
 $ sudo systemctl enable pigpiod.service
 $ sudo shutdown -r now
 ```
+Then check if everything is OK by using 
+`$ sudo systemctl status pigpiod.service`
+
 Motor PINs are connected as follows: 
 | Motor  | Amperka Board #2 |
 | ------------- | ------------- |
 | 5 Volt   | Amperka OUT between CS and GND |
 | Ground   | Amperka OUT GND       PIN 39  |
 | Comm    | Raspberry PIN 32 (PWM0)  |
-
-Then check if everything is OK by using 
-`$ sudo systemctl status pigpiod.service`
 
 ### Finally 
 Go to the folder where P-Miru is and excecute it using this command: 
