@@ -219,27 +219,32 @@ class camWrap():
                 counter = counter + 1
         return retVal 
 
+    # list files in a directory sorted by name
     def listdir_fullpath(self, d):
         return [os.path.join(d, f) for f in os.listdir(d)]
 
     # get the hypercube folder list for the viewer 
-    def getCubesList(self):
+    def getHypercubesList(self):
         folders = []
-        for (root,dirs,files) in os.walk(self.rootPath, topdown=True):
-            folders = dirs
+        for (root,dirs,files) in os.walk(self.rootPath, topdown=True, followlinks=False):
+            for folder in dirs:
+                if len(os.listdir(self.rootPath + os.path.sep + folder)) > 0:
+                    folders.append(folder)
             break
         
+        # order the folders by creation date 
+        folders.sort(key=lambda x: os.path.getmtime(self.rootPath + os.path.sep + x), reverse=True) 
+
         flist = []
         for folder in folders:
             ff = []
             for item in self.listdir_fullpath(self.rootPath + os.path.sep + folder + os.path.sep):
-                if os.path.isfile(item) and item.endswith('.jpg'):   #zwo (TODO this may be changed)
+                if os.path.isfile(item) and item.endswith('.tiff'):  #Only TIFF file will be listed
                     ff.append(item)
-                if os.path.isfile(item) and item.endswith('.tiff'):  #baumer (saved with opencv)
-                    ff.append(item)
+
+            ff.sort(key=lambda x: os.path.getmtime(x), reverse=True)  #sort files by creation date
             flist.append(ff)
 
-        
         return folders, flist
 
     # sets the default path and gets the number of the lats pic 

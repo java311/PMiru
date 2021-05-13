@@ -101,7 +101,7 @@ class CameraScreen(Screen):
         if (screen == 'viewer'):
             global cubeFolders
             global cubeFiles
-            cubeFolders, cubeFiles = camWrap.getCubesList()
+            cubeFolders, cubeFiles = camWrap.getHypercubesList()
             sm.get_screen("viewer").imageChange(cubeIndex, 0)
 
         self.manager.current = screen
@@ -138,13 +138,15 @@ class ViewerScreen(Screen):
             self.ids.viewer_img.source = 'img_not_found.jpg'
             return 
 
-        self.ids.cube_txt.text = str(cube_index) + "/" + str(maxCubes -1 )
+        self.ids.cube_txt.text = str(cube_index + 1) + "/" + str(maxCubes)
         maxLayers = len(cubeFiles[cube_index])
         if maxLayers == 0: 
             self.ids.layer_txt.text = "Layers: None"
             self.ids.viewer_img.source = 'img_not_found.jpg'
             return 
-        self.ids.layer_txt.text = "Layer " + str(layer_index)  + " of " + str(maxLayers -1)
+
+        self.ids.layer_txt.text = "Layer " + str(layer_index + 1)  + " of " + str(maxLayers)
+        print (cubeFiles[cube_index][layer_index])
         self.ids.viewer_img.source = cubeFiles[cube_index][layer_index]
 
     def imageChangebyFile(self, path, fname):
@@ -153,16 +155,21 @@ class ViewerScreen(Screen):
 
     def viewerBack_release(self):
         global cubeIndex
+        global layerIndex
         cubeIndex = cubeIndex - 1
         if (cubeIndex < 0):
             cubeIndex = len( cubeFolders ) - 1
+        layerIndex = 0
         self.imageChange(cubeIndex, 0)
 
     def viewerNext_release(self):
         global cubeIndex
+        global layerIndex
+
         cubeIndex = cubeIndex + 1
         if cubeIndex >= len(cubeFolders) :
             cubeIndex = 0
+        layerIndex = 0
         self.imageChange(cubeIndex, 0)
 
     def viewerLayerUp_release(self):
@@ -463,7 +470,7 @@ if __name__ == "__main__":
     #Start camera and read avalaible captures
     camWrap = camWrap() 
     camType = camWrap.camType
-    cubeFolders, cubeFiles = camWrap.getCubesList()
+    cubeFolders, cubeFiles = camWrap.getHypercubesList()
 
     #Init LED control object
     leds = ledControl()
