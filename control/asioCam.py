@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import glob, os
 import sys
+import json
 import time
 import re
 import zwoasi as asi
@@ -336,4 +337,13 @@ class asioCam():
         with open(fullpath, 'w') as f:
             for k in sorted(settings.keys()):
                 f.write('%s: %s\n' % (k, str(settings[k])))
+
+            #Save JSON exposure and gain values too
+            with open('config.json') as cfile:
+                cfg = json.load(cfile)
+                for c in cfg['lights']:
+                    f.write('WaveLenght: %s nm\n' % (str(c['wavelenght'])))
+                    f.write('Exposure: %s \n' % (str(c['zwo-exp'])))
+                    f.write('Gain: %s ms\n' % (str(c['zwo-gain'])))
+
         print('Camera settings saved to %s' % fullpath)
