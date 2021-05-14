@@ -22,6 +22,7 @@ wSizeY = 240
 sm = None #Kivy ScreenManager
 cubeThread = None # thread object to run capture process
 calibThread = None # thread object to run the calibration capture 
+exit_event = threading.Event()  # Event to kill capture and calib threads
 
 # PROGRAM CONTROL FLAGS
 # These flags are populated with config.json file
@@ -77,6 +78,8 @@ class CameraScreen(Screen):
             if frame is not None:   #3648, 5472
                 #reshape the frame to the windows size 
                 frame = cv2.resize(frame,(wSizeX,wSizeY))
+                if camType == 'zwo':
+                    frame = cv2.flip(frame, 1)   # Image flip for upside down ZWO camera
                 image_texture = Texture.create(size=(wSizeX,wSizeY), colorfmt='luminance')
                 
                 #create texture buffer for to show the image 
@@ -339,9 +342,11 @@ class PmiruApp(App):
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
 
-
+# Kills threads and Turn OFF lights before exit
 def before_destroy():
-    if leds is not None:
+    exit_event.set()  # Set event to kill capture threads
+
+    if leds is not None:  #Turn lights OFF
         leds.lightsOff()
 
 # NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACEN INFRONT A WHITE SCREEN OR SURFACE
@@ -361,7 +366,10 @@ def runLightCalibration():
     nColors = leds.nColors
     autoGainVals = [];  autoExpVals = [];  autoMedVals = []
     for color in range(0,nColors): # For each color
-    
+        if exit_event.is_set():
+            print ("Calibration thread killed...")
+            return
+
         leds.colorOnOff(color, True)  # Turn on each LED
         
         egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, drops=5, good_frames=3) #calibrate with median, return exp,gain,median
@@ -418,6 +426,10 @@ def takeHyperCube():
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
         for color in range(0,leds.nColors): # For each color
+            if exit_event.is_set():
+                print ("Capture thread killed...")
+                return
+
             leds.colorOnOff(color, True)  # Turn lights ON
             exp_gain = leds.getColorExpGain(camType=camWrap.camType, index=color)
             camWrap.set_exposure(exp_gain[0])
