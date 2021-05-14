@@ -96,6 +96,13 @@
             size_hint: 0.1, 0.1
             font_size: '15sp'
             pos_hint: {"x":0.85, 'top':0.6}
+        Label:
+            id: name_txt
+            text: 'xxx'
+            color: 1, 0, 0, 1 #red
+            size_hint: 0.1, 0.1
+            font_size: '15sp'
+            pos_hint: {"x":0.2, 'top':0.1}
         
 
 <ConfigScreen>:
@@ -222,9 +229,9 @@
 
         BoxLayout:
             orientation: 'horizontal'
-            ActionButton:
+            Button:
                 text: 'Auto Calibration'
-                opacity: 0.5
+                # opacity: 0.5
                 font_size: '18dp'
                 color: 1, 0, 0, 1 #red
                 # icon: 'led_red.png'

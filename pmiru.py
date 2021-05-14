@@ -146,7 +146,8 @@ class ViewerScreen(Screen):
             return 
 
         self.ids.layer_txt.text = "Layer " + str(layer_index + 1)  + " of " + str(maxLayers)
-        print (cubeFiles[cube_index][layer_index])
+        self.ids.name_txt.text = os.path.basename(cubeFiles[cube_index][layer_index]) 
+        print (cubeFiles[cube_index][layer_index])  # DEBUG
         self.ids.viewer_img.source = cubeFiles[cube_index][layer_index]
 
     def imageChangebyFile(self, path, fname):
@@ -421,7 +422,7 @@ def takeHyperCube():
             exp_gain = leds.getColorExpGain(camType=camWrap.camType, index=color)
             camWrap.set_exposure(exp_gain[0])
             camWrap.set_gain(exp_gain[1])
-            fname = "img_" + format(counter, '02d') + "_c" + format(color, '02d') + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
+            fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname, drops=3)
             leds.colorOnOff(color, False)  # Turn lights OFF
             
