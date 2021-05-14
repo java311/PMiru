@@ -467,6 +467,7 @@ if __name__ == "__main__":
             maximizeStart = c['maximized'] 
             stackedTiffs = c['stacks']
             rotateImages = c['rotate']
+            motor_angles = c['motor_angles']
 
     #Start camera and read avalaible captures
     camWrap = camWrap() 
@@ -477,8 +478,8 @@ if __name__ == "__main__":
     leds = ledControl()
 
     #Init Motor control object
-    motor = Motor()
-    motor.initAngles([-144, -99, -54, -9, 36])
+    motor = Motor() 
+    motor.initAngles(motor_angles) # Fuataba servo angle CAN go from -144 to 144
     motor.movetoInit() 
 
     #In case you want to use the filter wheel
