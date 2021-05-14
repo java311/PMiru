@@ -464,13 +464,6 @@ def takeHyperCube():
 
 
 if __name__ == "__main__":
-    # #Check cmd line arguments
-    # parser = argparse.ArgumentParser(prog="pmiru")
-    # parser.add_argument("-m", help="full screen start", action='store_true', required=False)
-    # args = parser.parse_args()
-    # if args.m :
-    #     maximizeStart = True
-    
     # Read config json file and initilize config flags and led values
     with open('config.json') as cfile:
         cfg = json.load(cfile)
@@ -480,7 +473,14 @@ if __name__ == "__main__":
             stackedTiffs = c['stacks']
             rotateImages = c['rotate']
             motor_angles = c['motor_angles']
-
+    
+    # Check cmd line arguments
+    parser = argparse.ArgumentParser(prog="pmiru")
+    parser.add_argument("-m", help="full screen start", action='store_true', required=False)
+    args = parser.parse_args()
+    if args.m :
+        maximizeStart = True
+    
     #Start camera and read avalaible captures
     camWrap = camWrap() 
     camType = camWrap.camType
