@@ -103,17 +103,19 @@ And then Reboot
 Then the last two must be commented. Otherwise, Kivy will register ghost and random clicks. )
 
 #### Touchscreen connection pins
-The touchscreen must be connected to the Raspberyy suing SPI0, plus 3.3V, 5V, ground. 
+The touchscreen must be connected to the Raspberyy using SPI0, 3.3V, 5V, Ground and 2 communications PINS 
 Here are the PINs configuration: 
 
-| LCD PIN hole  | Raspbery PIN number |
+| PIN Function  | Raspbery-LCD PIN number |
 | ------------- | ------------- |
 | 5 Volt   | PIN 2  |
-| 3.3 Volt   | PIN 17  |
-| SPI pins GND and extras   | PINs 19, 20, 21, 22, 23, 24  |
-(LCD PIN Numbers are the same as the Raspberry. Just check the orientation of the PIN slot)
+| 3.3 Volt   | PIN 1  |
+| SPI0 and COMMs   | PINs 18, 19, 20, 21, 22, 23, 24, 26  |
 
-![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
+LCD PIN numbers are the same as the Raspberry. 
+Just check the orientation of the LCD PIN slot, it is designed to cover all the Raspberry output pins.
+
+![](https://i.ibb.co/m00sgT8/pitft-pinout.png)
 
 ### Amperka board install (light control)
 (Amperka python libraries were modified, so these are include in source code. There is no need to install them)
@@ -131,23 +133,23 @@ pi@raspberrypi:~/PMiru $ ls /dev/spi*
 ```
 
 #### Amperka boards connection pins
-Then connect Amperka boards using the following configuration: 
+Then connect Amperka board #0 with the Raspberry using the following PIN configuration: 
 | Amperka  | Raspberry PIN |
 | ------------- | ------------- |
-| pulse icon pin   | SLCK      PIN 40  |
-| Ground   | GND       PIN 39  |
-| DI   | MOSI SPI1 PIN 38  |
-| CS   | SPI CE2   PIN 36  |
-| pin between GND and Clock (5V)   | 5V        PIN 2  |
+| pulse icon pin   | PIN 40  (SLCK) |
+| G (Ground) | PIN 39 (GND)  |
+| DI   | PIN 38 (MOSI SPI1) |
+| CS   | PIN 36 (SPI CE2) |
+| pin between GND and Clock (5V)   | PIN 2 (5V) |
 
 ![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
 
-(the boards had been hacked to work with 3.3Volts) 
-with the purple cables soldered on each of the boards. 
+(The boards had been hacked to work with 3.3Volts 
+with the cables soldered on each of the boards. Do not dissconnect them ! ) 
 
-To control the 10 colors, it is necessary to have two Amperka boards connected to each other using SPI.
-Just use jumper camples to connect the SPI output to the SPI input with the correspondant PINs on the other board.
-(Do not forget to connect the 5V hacked PIN)
+To control the 10 colors, it is necessary to have 2 Amperka boards connected to each other using SPI.
+To connect them togheter, use jumper cables to connect the SPI output of board #0 to the same PINS of the SPI input in board #1
+Connect all the 6 pins of SPI-Out (board #0) to the SPI-In (board #1) 
 
 ### Motor (PWM daemon) 
 Motors are controlled using PWM. pigpio demon needs to be started as a daemon on every boot. 
