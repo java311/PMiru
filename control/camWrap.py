@@ -6,6 +6,7 @@ import os
 from sys import platform
 from datetime import datetime
 import tifffile
+from PIL import Image, ImageOps
 
 # Program imports
 from control.asioCam import asioCam              #class to control the ZWO camera
@@ -239,7 +240,7 @@ class camWrap():
         for folder in folders:
             ff = []
             for item in self.listdir_fullpath(self.rootPath + os.path.sep + folder + os.path.sep):
-                if os.path.isfile(item) and item.endswith('.tiff') and os.path.getsize(item) < 50000000 : #Only TIFF file < 50 Mb will be listed
+                if os.path.isfile(item) and item.endswith('.tiff') and os.path.getsize(item) < 30000000 : #Only TIFF file < 50 Mb will be listed
                     ff.append(item)
 
             ff.sort(key=lambda x: os.path.getmtime(x), reverse=True)  #sort files by creation date
@@ -257,21 +258,27 @@ class camWrap():
             self.rootPath = rootPath
 
     # If ZWO, then rotate the captured images 
-    def rotateImageFiles(self, path): 
+    def rotateImageFiles(self, path, prog_bar): 
         if self.camType == 'zwo':
             print ('Rotating image FILES taken with ZWO cameras. This will be slow....')
             ff = []
+            prog_bar.value = 0
             for item in self.listdir_fullpath(path):  #openf jpg and tiff
                 if os.path.isfile(item) and item.endswith('.jpg'):   
                     ff.append(item)
                 if os.path.isfile(item) and item.endswith('.tiff'):  
                     ff.append(item)
 
+            i = 0
+            n = len(ff)
             for img_path in ff:
-                print ("Rotating: " + img_path)
-                img = cv2.imread(img_path)  #open image
-                rotated_img = cv2.rotate(img, cv2.ROTATE_180)  #rotate
-                cv2.imwrite(img_path, rotated_img)  #overwrite
+                img = Image.open(img_path)
+                rimg = ImageOps.flip(img)
+                rimg.save(img_path)
+
+                i = i + 1
+                prog_bar.value = int((i * 100) / n)
+                print ("Rotated: " + img_path + " " + str( int((i * 100) / n) ) + " %")  
         else:
             pass
 
@@ -285,15 +292,19 @@ class camWrap():
 
         stackPath = path + os.path.sep 
         prog_bar.value = 0
+        img_indx = 0
+        n = len(ff)
+        print (len(ff))
         for color in range(0,leds.nColors): #For each LED color
             with tifffile.TiffWriter(stackPath + "stack_" + str(leds.getWavelenght(color)) + "nm_.tiff") as stack:
                 for img_path in ff:
-                    if "_c" + format(color, '02d') in img_path:
-                        print ("Saving file in stack: " + img_path)
+                    print (img_path)
+                    if "_c" + str(leds.getWavelenght(color)) in img_path:
+                        img_indx = img_indx + 1
+                        prog_bar.value = int((img_indx * 100) / n)
+                        print ("Saving file in stack: " + img_path + " " + str( int((img_indx * 100) / n) ) + " %" )
                         stack.save(tifffile.imread(img_path), photometric='minisblack', contiguous=True)
 
-            progress = int((color * 100) / leds.nColors)
-            prog_bar.value = progress
             print ("Tiff Stack saved: " + stackPath + "stack_" + str(leds.getWavelenght(color)) + "nm_.tiff") 
 
         

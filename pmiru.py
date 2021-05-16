@@ -452,7 +452,7 @@ def takeHyperCube():
                     sm.get_screen("camera").image_path = folder
                 
     if rotateImages == True:
-        camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
+        camWrap.rotateImageFiles(folder, sm.get_screen("camera").ids.prog_bar)  #If ZWO, then rotate the captured images
     if stackedTiffs == True:
         camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar)  #Stacked tiffs by led color 
 
