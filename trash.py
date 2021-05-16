@@ -92,3 +92,131 @@ def takeHyperCube():
     # camWrap.rotateImageFiles(folder)  #If ZWO, then rotate the captured images
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)
+
+
+
+
+    # MEDIAN ALGORITM TRASH 
+
+        print (autoMedVals)
+    print (autoExpVals)
+    print (autoGainVals)
+
+    drops = 5
+    avgs = 3
+    cycles = 0
+    threshold = 5
+    g_step = 5.0; e_step = 3
+    # gains = [0]*nColors; exps = [0]*nColors; meds = [0]*nColors; ok = [False]*nColors
+    gains = autoGainVals; exps = autoExpVals; meds = autoMedVals; ok = [False]*nColors
+    ok[darkIndex] = True
+    while (cycles <= 10):
+
+        for color in range(0,nColors):
+            # if ok[color] == True:
+            #     continue
+
+            tmpFilePath = os.getcwd() + os.path.sep + "color_calib_"+ str(color) +"_.tiff"
+
+            # if (meds[color] <= meds[darkIndex]): # increase gain / exp
+            #     exps[color] =  exps[color] + e_step
+            #     gains[color] =  gains[color] + g_step
+            # elif (meds[color] > meds[darkIndex]):  # decrease gain
+            #     exps[color] =  exps[color] - e_step
+            #     gains[color] =  gains[color] - g_step
+
+            camWrap.set_gain(gains[color])
+            camWrap.set_exposure(exps[color])
+            leds.colorOnOff(color, True)  # Turn on the darkest LED ON
+
+            meds[color] = camWrap.get_median_singleShoot(tmpFilePath, drops=3, avgs=1)
+            # exp = camWrap.get_exposure()   #in microseconds
+            # gain = camWrap.get_gain()      #unitless
+
+            # adjust the gain and the median
+            # gains[color] = (autoGainVals[darkIndex] * meds[color]) / autoGainVals[darkIndex]
+            # exps[color] = (autoExpVals[darkIndex] * meds[color]) / autoExpVals[darkIndex]
+
+            # check if threshold is reached
+            print ("color:" +str(color) + " median: " + str(meds[color]) + " difference: "+ str(meds[color] - meds[darkIndex]))
+            if abs(meds[color] - meds[darkIndex]) < threshold:
+                ok[color] = True
+
+            leds.colorOnOff(color, False)  # Turn on the darkest LED ON
+            print (ok)
+            print (meds)
+            print (exps)
+            print (gains)
+
+        #break cycle if all medians are bellow the threshold
+        allOk = True
+        for color in range(0,leds.nColors):
+            if ok[color] == False:
+                allOk = False
+                break
+         
+        if allOk == True:
+            break
+
+        cycles = cycles +1
+        print ('cyclo:' + str(cycles))
+
+
+    # for color in range(0,leds.nColors): # For each color
+    #     if color == darkIndex: #Jump the darkest LED
+    #        continue
+
+    #     leds.colorOnOff(color, True)  # Turn on the darkest LED ON
+
+    #     camWrap.set_gain(darkGain)
+    #     camWrap.set_exposure(darkExp)
+        
+    #     median = 0
+    #     limit = 1000
+    #     while (darkMedian - median > limit):
+    #         median = camWrap.get_median(drops=3, avgs=3)
+    #         print (darkMedian)
+    #         print (median)
+    #         print (median - darkMedian)
+
+    #         camWrap.set_gain(darkGain)
+    #         camWrap.set_exposure(darkExp)
+
+    #     leds.colorOnOff(color, False)  # Turn on the darkest LED ON
+        
+
+    # # sm.get_screen("camera").refreshByFile = False # Disable camera refresh screen
+
+
+    # # Save the calibration results in config json file
+
+
+
+    # If ZWO, then rotate the captured images 
+    def rotateImageFiles(self, path, prog_bar, exit_event): 
+        if self.camType == 'zwo':
+            print ('Rotating image FILES taken with ZWO cameras. This will be slow....')
+            ff = []
+            prog_bar.value = 0
+            for item in self.listdir_fullpath(path):  #openf jpg and tiff
+                if os.path.isfile(item) and item.endswith('.jpg'):   
+                    ff.append(item)
+                if os.path.isfile(item) and item.endswith('.tiff'):  
+                    ff.append(item)
+
+            i = 0
+            n = len(ff)
+            for img_path in ff:
+                if exit_event.is_set():
+                    print ("Rotation thread killed...")
+                    return
+
+                img = Image.open(img_path)
+                rimg = ImageOps.flip(img)
+                rimg.save(img_path)
+
+                i = i + 1
+                prog_bar.value = int((i * 100) / n)
+                print ("Rotated: " + img_path + " " + str( int((i * 100) / n) ) + " %")  
+        else:
+            pass

@@ -96,7 +96,7 @@ class baumerCam():
 
     #saves a single taken frame in a file FAKE method 
     #only takes a single frame from the video stream
-    def takeSingleShoot(self, path, filename, drops=3):
+    def takeSingleShoot(self, path, filename, drops=3, rot=False):
         # New "optimized" version
         fullpath = path + os.path.sep + filename
         print ("Taking frame...")

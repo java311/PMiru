@@ -435,7 +435,7 @@ def takeHyperCube():
             camWrap.set_exposure(exp_gain[0])
             camWrap.set_gain(exp_gain[1])
             fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
-            camWrap.takeSingleShoot(path=folder, filename=fname, drops=3)
+            camWrap.takeSingleShoot(path=folder, filename=fname, drops=3, rot=rotateImages )
             leds.colorOnOff(color, False)  # Turn lights OFF
             
             progress = int((counter * 100) / nlayers)
@@ -451,10 +451,8 @@ def takeHyperCube():
                     sm.get_screen("camera").image_name = fname
                     sm.get_screen("camera").image_path = folder
                 
-    if rotateImages == True:
-        camWrap.rotateImageFiles(folder, sm.get_screen("camera").ids.prog_bar)  #If ZWO, then rotate the captured images
     if stackedTiffs == True:
-        camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar)  #Stacked tiffs by led color 
+        camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar, exit_event)  #Stacked tiffs by led color 
 
     camWrap.saveControlValues(path=folder, filename="controlValues.txt")
     camWrap.captureLoop(True)

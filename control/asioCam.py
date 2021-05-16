@@ -8,6 +8,7 @@ import re
 import zwoasi as asi
 from threading import Thread
 from collections import deque
+from PIL import Image, ImageOps
 
 
 # Documentation
@@ -314,7 +315,7 @@ class asioCam():
 
     # FAKE method to take still images from the video capture loop
     # bit indicates the image forta 8bit (jpeg) or 16bit (tiff) monochrome 
-    def takeSingleShoot(self, path, filename, drops=3):
+    def takeSingleShoot(self, path, filename, drops=3, rot=True):
         fullpath = path + os.path.sep + filename
         print ("Taking frame...")
         # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
@@ -326,6 +327,11 @@ class asioCam():
 
         # this is the GOOD one
         self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
+        if rot:  #If rotation flag is on, rotate images with OpenCV
+            img = cv2.imread(fullpath, -1)
+            img = cv2.flip(img, -1)
+            cv2.imwrite(fullpath, img)
+            print ("Flipping image....")
 
         print ("Saving frame as: " + str(fullpath))
 

@@ -187,8 +187,8 @@ class camWrap():
         else:
             pass  #TODO implement this function for Baumer
 
-    def takeSingleShoot(self, path, filename, drops):
-        self.cam.takeSingleShoot(path=path, filename=filename, drops=drops )
+    def takeSingleShoot(self, path, filename, drops, rot):
+        self.cam.takeSingleShoot(path=path, filename=filename, drops=drops, rot=rot )
 
     def stopVideoMode(self):
         if self.camType == 'zwo':
@@ -257,33 +257,8 @@ class camWrap():
         else:
             self.rootPath = rootPath
 
-    # If ZWO, then rotate the captured images 
-    def rotateImageFiles(self, path, prog_bar): 
-        if self.camType == 'zwo':
-            print ('Rotating image FILES taken with ZWO cameras. This will be slow....')
-            ff = []
-            prog_bar.value = 0
-            for item in self.listdir_fullpath(path):  #openf jpg and tiff
-                if os.path.isfile(item) and item.endswith('.jpg'):   
-                    ff.append(item)
-                if os.path.isfile(item) and item.endswith('.tiff'):  
-                    ff.append(item)
-
-            i = 0
-            n = len(ff)
-            for img_path in ff:
-                img = Image.open(img_path)
-                rimg = ImageOps.flip(img)
-                rimg.save(img_path)
-
-                i = i + 1
-                prog_bar.value = int((i * 100) / n)
-                print ("Rotated: " + img_path + " " + str( int((i * 100) / n) ) + " %")  
-        else:
-            pass
-
     # Builds a TIFF stack for each of the LED color
-    def buildTiffStacks(self, path, leds, prog_bar):
+    def buildTiffStacks(self, path, leds, prog_bar, exit_event):
         print ('Building the TIFF stacked files by LED color. This will be slow....')
         ff = []
         for item in self.listdir_fullpath(path):  #open ONLY tiff files
@@ -298,7 +273,10 @@ class camWrap():
         for color in range(0,leds.nColors): #For each LED color
             with tifffile.TiffWriter(stackPath + "stack_" + str(leds.getWavelenght(color)) + "nm_.tiff") as stack:
                 for img_path in ff:
-                    print (img_path)
+                    if exit_event.is_set():
+                        print ("Stack creation killed...")
+                        return
+                    
                     if "_c" + str(leds.getWavelenght(color)) in img_path:
                         img_indx = img_indx + 1
                         prog_bar.value = int((img_indx * 100) / n)
