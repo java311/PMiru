@@ -15,6 +15,7 @@ from control.baumerCam import baumerCam          #class to control the Baumer ca
 class camWrap():
     cam = None
     camType = 'zwo'
+    zwoMini = False
     rootPath = ""
     cubeIndex = 0
     cubePaths = None
@@ -24,8 +25,10 @@ class camWrap():
         #check OS 
         if platform == 'win32':  #If Windows select the camera type manually
             self.camType =  'zwo'
-        else:     
-            self.camType = self.checkCamType()
+        else:   
+            ct = self.checkCamType() 
+            self.camType = ct[0]
+            self.zwoMini = ct[1]
 
         if self.camType == 'zwo':
             asioCam()
@@ -60,7 +63,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('03c3:183a') != -1:
             print ("ZWO camera found.")
-            return 'zwo'  #zwo found 
+            return ['zwo',False]  #zwo found 
 
         # check if ZWO120MM (mini finder) is present
         out = subprocess.Popen(['lsusb', '-d', '03c3:120c'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -69,7 +72,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('03c3:120c') != -1:
             print ("ZWO120MM (mini finder) camera found.")
-            return 'zwo'  #zwo found 
+            return ['zwo',True]  #if zwo MINI also return True 
  
         # check if ZWO178 MM is present (medium size CCD)
         out = subprocess.Popen(['lsusb', '-d', '03c3:178c'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -78,7 +81,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('03c3:178c') != -1:
             print ("ZWO 178MM (medium size CCD) camera found.")
-            return 'zwo'  #zwo found 
+            return ['zwo',False]  #zwo found 
 
         #check if Baumer is present 
         out = subprocess.Popen(['lsusb', '-d', '2825:0157'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -87,7 +90,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('2825:0157') != -1:
             print ("Baumer camera found.")
-            return 'baumer'  #baumer found
+            return ['zwo',False]  #baumer found
 
 
         print ("ERROR: No Baumer or ZWO cameras found")
@@ -141,10 +144,13 @@ class camWrap():
     def get_img_type(self):
         return self.cam.imgType
         
+    # returns the camera exposure in ms
     def get_exposure(self):
         if self.camType == 'zwo':
-            # return self.cam.exposure
-            return self.cam.getExposure()
+            if self.zwoMini:
+                return int(self.cam.getExposure())
+            else:
+                return int(self.cam.getExposure()/1000.0)  
         else:
             return self.cam.get_exposure()
 

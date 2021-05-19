@@ -240,7 +240,8 @@ class ConfigScreen(Screen):
             self.autoExposure = True
         else: 
             #update the GUI values 
-            self.exposure = int(camWrap.get_exposure()/1000)  #in milliseconds 
+            self.exposure = camWrap.get_exposure()  #in milliseconds 
+            print (self.exposure)
             self.ids.exp_slider.value = self.exposure
             # self.ids.exp_range_select.disabled = False
             self.ids.exp_slider.disabled = False

@@ -62,6 +62,8 @@ class asioCam():
         # Restore all controls to default values 
         controls = self.camera.get_controls()
         for c in controls:
+            if controls[c]['ControlType'] == asi.ASI_BANDWIDTHOVERLOAD:
+                continue
             self.camera.set_control_value(controls[c]['ControlType'], controls[c]['DefaultValue'])
 
         self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
@@ -100,13 +102,14 @@ class asioCam():
     # gets the exposure value from the camera API
     def getExposure(self):
         settings = self.camera.get_control_values()
-        print (settings['Exposure'])
+        print (settings)
+        print ("Exposure: " + str(settings['Exposure']))
         return settings['Exposure']
         
     # gets the exposure value from the camera API
     def getGain(self):
         settings = self.camera.get_control_values()
-        print (settings['Gain'])
+        print ("Gain: " + str(settings['Gain']))
         return settings['Gain']
 
     # sets auto exposure and calulates the right settings for it 
@@ -127,6 +130,9 @@ class asioCam():
     # calculate the correct settings for auto/gain exposure
     def autoExposureGainCalib(self, with_median, wait, drops, good_frames, min_median, max_median ):
         controls = self.camera.get_controls()
+        print ("pinchi")
+        print ( controls['Gain']['DefaultValue'])
+        print ( controls['Exposure']['DefaultValue'])
         # print('Use minium USB Bandwidth')
         # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
 
@@ -142,10 +148,9 @@ class asioCam():
 
         # Keep max gain to the default but allow exposure to be increased to its maximum value if necessary
         # self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
-        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
+        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 5000000)  # Set MAX exposure time to 2 seconds
 
         print('Waiting for auto-exposure to compute correct settings ...')
-        fp = os.getcwd() + os.path.sep + "fp_calib_.tiff"   #median temporal filepath
         sleep_interval = wait  #0.100 original value
         df_last = None
         gain_last = None
@@ -162,6 +167,8 @@ class asioCam():
             df = self.camera.get_dropped_frames()
             gain = settings['Gain']
             exposure = settings['Exposure']
+            print (gain)
+            print (exposure)
             median = 0
             if df != df_last:
                 if with_median == True: #Hack added to calibrate the camera with median instead of exposure/gain
