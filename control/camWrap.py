@@ -41,7 +41,10 @@ class camWrap():
             if platform == 'ubuntu':
                 lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
             
-            if (self.cam.initCam(lib_path=lib_path, imgType=16) == True):
+            imgType = 16  #default imgType 16bit mono
+            if self.zwoMini:
+                imgType = 8  #if mini use 8bit
+            if (self.cam.initCam(lib_path=lib_path, imgType=imgType) == True):
                 self.cam.startCaptureLoop()
             else:
                 print("ERROR: Failed camera init.")
@@ -164,8 +167,8 @@ class camWrap():
               
     # Exposure must be given in milliseconds
     def set_exposure(self, value):
-        self.cam.setExposure(value)
-
+        self.cam.setExposure(value, 'ns')
+        
     # Gain must be given in a range between 0 to 100 (auto converts for Baumer)
     def set_gain(self, value):
         if self.camType == 'baumer':

@@ -16,27 +16,27 @@ from PIL import Image, ImageOps
 # https://github.com/OpenPHDGuiding/phd2/blob/master/cameras/ASICamera2.h
 
 class asioCam():
-    cam_id = 0    #camera libray ID
-    camera = None #camera object
-    timeout = -1  #infinite timeout
-    exposure = None
-    gain = None
-    median = None
-    stop = False
-    autoExp = False
-    autoGain = False
-    
-    imgType = 8  #8 or 16 bits
-
-
     def __init__(self, deque_size=50 ):
+        self.cam_id = 0    #camera libray ID
+        self.camera = None #camera object
+        self.timeout = -1  #infinite timeout
+        self.exposure = None
+        self.gain = None
+        self.median = None
+        self.stop = False
+        self.autoExp = False
+        self.autoGain = False
+        
+        self.imgType = 16  #8 or 16 bits
+
+
         #object to que the frames
         self.deque = deque(maxlen=deque_size)
 
         self.get_frame_thread = Thread(target=self.get_frame, args=())
         self.get_frame_thread.daemon = True
 
-    def initCam(self, lib_path='/lib/arm-linux-gnueabihf/libASICamera2.so',  cam_model='ZWO ASI183MM', imgType=8):
+    def initCam(self, lib_path='/lib/arm-linux-gnueabihf/libASICamera2.so',  cam_model='ZWO ASI183MM', imgType=16):
 
         # Init ASIO static library 
         print (lib_path)
@@ -69,9 +69,11 @@ class asioCam():
         self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
 
         if imgType == 8:
+            print ("Setting camera to 8 bits....")
             self.camera.set_image_type(asi.ASI_IMG_RAW8)
             self.imgType = 8
         else:
+            print ("Setting camera to 16 bits....")
             self.camera.set_image_type(asi.ASI_IMG_RAW16)
             self.imgType = 16
 
@@ -102,14 +104,13 @@ class asioCam():
     # gets the exposure value from the camera API
     def getExposure(self):
         settings = self.camera.get_control_values()
-        print (settings)
-        print ("Exposure: " + str(settings['Exposure']))
+        print ("Exposure is " + str(settings['Exposure']))
         return settings['Exposure']
         
     # gets the exposure value from the camera API
     def getGain(self):
         settings = self.camera.get_control_values()
-        print ("Gain: " + str(settings['Gain']))
+        print ("Gain is " + str(settings['Gain']))
         return settings['Gain']
 
     # sets auto exposure and calulates the right settings for it 
@@ -130,11 +131,6 @@ class asioCam():
     # calculate the correct settings for auto/gain exposure
     def autoExposureGainCalib(self, with_median, wait, drops, good_frames, min_median, max_median ):
         controls = self.camera.get_controls()
-        print ("pinchi")
-        print ( controls['Gain']['DefaultValue'])
-        print ( controls['Exposure']['DefaultValue'])
-        # print('Use minium USB Bandwidth')
-        # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MinValue'])
 
         print('Enabling auto-exposure mode')
         self.camera.set_control_value(asi.ASI_EXPOSURE,
@@ -148,7 +144,7 @@ class asioCam():
 
         # Keep max gain to the default but allow exposure to be increased to its maximum value if necessary
         # self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
-        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 5000000)  # Set MAX exposure time to 2 seconds
+        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
 
         print('Waiting for auto-exposure to compute correct settings ...')
         sleep_interval = wait  #0.100 original value
@@ -167,8 +163,6 @@ class asioCam():
             df = self.camera.get_dropped_frames()
             gain = settings['Gain']
             exposure = settings['Exposure']
-            print (gain)
-            print (exposure)
             median = 0
             if df != df_last:
                 if with_median == True: #Hack added to calibrate the camera with median instead of exposure/gain
@@ -213,16 +207,16 @@ class asioCam():
         return [self.exposure, self.gain, self.median]
 
     # Set the manual exposure value 
-    def setExposure(self, expValue, units='ms'):
+    def setExposure(self, expValue, toUnits='ns'):
         # Disable auto exposure
         self.autoExp = False
         self.setAutoExposure(False)
 
         # Converts milliseconsd to microseconds
-        if (units == 'ms'): 
-            microsec_exp = int(expValue * 1000)
+        if (toUnits == 'ns'): 
+            expValue = int(expValue * 1000)
 
-        self.camera.set_control_value(asi.ASI_EXPOSURE, microsec_exp)
+        self.camera.set_control_value(asi.ASI_EXPOSURE, expValue)
         return 
 
     #Manually set the gain of the camera 
@@ -261,8 +255,8 @@ class asioCam():
                     rawImg = np.frombuffer(raw, dtype=np.uint16)
                 rawImg = rawImg.reshape(shape)
     
-                #show = cv2.resize(rawImg, (self.guiResX, self.guiResY))  #original 
-                #show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)             #original
+                # show = cv2.resize(rawImg, (800, 600))  # OPENCV DEBUG
+                # show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)             #OPENCV DEBUG
 
                 # cv2.imshow("show", show)  #OPENCV DEBUG
                 # cv2.waitKey(1)            #OPENCV DEBUG
@@ -325,8 +319,6 @@ class asioCam():
     def takeSingleShoot(self, path, filename, drops=3, rot=True):
         fullpath = path + os.path.sep + filename
         print ("Taking frame...")
-        # self.camera.capture_video_frame(filename=fullpath, timeout=self.timeout)
-        # self.camera.capture(filename=filename)
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
