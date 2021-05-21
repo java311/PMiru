@@ -427,7 +427,6 @@ def takeHyperCube():
     sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
     sm.get_screen("camera").ids.prog_bar.value = 0
     sm.get_screen("camera").ids.shoot_btn.disabled = True
-    # camWrap.stopVideoMode()
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
         for color in range(0,leds.nColors): # For each color
