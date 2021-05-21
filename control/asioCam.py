@@ -36,7 +36,7 @@ class asioCam():
         self.get_frame_thread = Thread(target=self.get_frame, args=())
         self.get_frame_thread.daemon = True
 
-    def initCam(self, lib_path='/lib/arm-linux-gnueabihf/libASICamera2.so',  cam_model='ZWO ASI183MM', imgType=16):
+    def initCam(self, lib_path='/lib/arm-linux-gnueabihf/libASICamera2.so',  cam_model='ZWO ASI183MM', imgType=8):
 
         # Init ASIO static library 
         print (lib_path)
@@ -85,6 +85,7 @@ class asioCam():
             raise
         except:
             pass
+        
         print('Enabling video mode')
         self.camera.start_video_capture()        
 
@@ -93,6 +94,15 @@ class asioCam():
         print ("Auto Exposure value: " + str(self.exposure))
         
         return True 
+
+    # changes camera bitrate
+    def changeImgType(self, imgType):
+        if imgType == 8:
+            self.camera.set_image_type(asi.ASI_IMG_RAW8)
+            self.imgType = imgType
+        if imgType == 16:
+            self.camera.set_image_type(asi.ASI_IMG_RAW16)
+            self.imgType = imgType
 
     # gets the max and min gain 
     def getMinMaxGain(self):
@@ -249,7 +259,7 @@ class asioCam():
         while (True):
             if self.stop == False:
                 raw = self.camera.get_video_data(timeout=self.timeout)
-                if self.imgType == 8:
+                if self.imgType == 8 or self.imgType == 12:
                     rawImg = np.frombuffer(raw, dtype=np.uint8)
                 else:
                     rawImg = np.frombuffer(raw, dtype=np.uint16)
@@ -289,6 +299,9 @@ class asioCam():
 
     def stopVideoMode(self):
         self.camera.stop_video_capture()
+
+    def stopExposure(self):
+        self.camera.stop_exposure()
 
     def startVideoMode(self):
         self.camera.start_video_capture()

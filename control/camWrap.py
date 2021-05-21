@@ -31,7 +31,6 @@ class camWrap():
             self.zwoMini = ct[1]
 
         if self.camType == 'zwo':
-            asioCam()
             #global objects for ASIO camera control
             self.cam = asioCam()
 
@@ -41,10 +40,7 @@ class camWrap():
             if platform == 'ubuntu':
                 lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
             
-            imgType = 16  #default imgType 16bit mono
-            if self.zwoMini:
-                imgType = 8  #if mini use 8bit
-            if (self.cam.initCam(lib_path=lib_path, imgType=imgType) == True):
+            if (self.cam.initCam(lib_path=lib_path, imgType=8) == True):  # default imgType 8bit 
                 self.cam.startCaptureLoop()
             else:
                 print("ERROR: Failed camera init.")
@@ -98,7 +94,6 @@ class camWrap():
 
         print ("ERROR: No Baumer or ZWO cameras found")
         sys.exit()
-        
 
     def get_video_frame(self):
         return self.cam.get_video_frame()
@@ -146,7 +141,21 @@ class camWrap():
 
     def get_img_type(self):
         return self.cam.imgType
-        
+
+    # changes the camera bitrate, but first stops all captures
+    def changeImgType(self, imgType):
+        try:
+            self.cam.stopExposure()
+            self.cam.stopVideoMode()
+        except (KeyboardInterrupt, SystemExit):
+            print ("ERROR: camera capture could be stopped.")
+            raise
+        except:
+            print ("ERROR: camera capture could be stopped.")
+            pass
+
+        self.cam.changeImgType(imgType)
+            
     # returns the camera exposure in ms
     def get_exposure(self):
         if self.camType == 'zwo':
@@ -208,6 +217,12 @@ class camWrap():
     def startVideoMode(self):
         if self.camType == 'zwo':
             self.cam.startVideoMode()
+        else:
+            pass
+
+    def stopExposure(self):
+        if self.camType == 'zwo':
+            self.cam.stopExposure()
         else:
             pass
 
