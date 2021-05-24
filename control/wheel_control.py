@@ -2,16 +2,18 @@ import PyIndi
 import time
  
 class WheelControl(PyIndi.BaseClient):
-    cmonitor = None 
-    dmonitor = None 
-    newval = None 
-    prop = None
-    monitored = "ASI EFW"
-    slot = None 
-    num_slots = 5
 
     def __init__(self):
+        self.cmonitor = None 
+        self.dmonitor = None 
+        self.newval = None 
+        self.prop = None
+        self.monitored = "ASI EFW"
+        self.slot = None 
+        self.num_slots = 5
+        
         super(WheelControl, self).__init__()
+    
     def newDevice(self, d):
         # We catch the monitored device
         self.dmonitor=d

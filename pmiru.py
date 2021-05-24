@@ -416,8 +416,9 @@ def takeHyperCube():
     camWrap.captureLoop(False) #for zwo camera is necessary to stop the video loop
 
     # change from 8 bit (video feed) to 16 for final image capture
-    camWrap.changeImgType(16)
-    camWrap.startVideoMode()
+    if camWrap.camType == 'zwo':
+        camWrap.changeImgType(16)
+        camWrap.startVideoMode()
 
     folder = camWrap.getNewFolder()
     counter = 1
@@ -456,8 +457,9 @@ def takeHyperCube():
                     sm.get_screen("camera").image_path = folder
 
     # go back to 8 bit for video feed and led calibration
-    camWrap.changeImgType(8)
-    camWrap.startVideoMode()
+    if camWrap.camType == 'zwo':
+        camWrap.changeImgType(8)
+        camWrap.startVideoMode()
                 
     if stackedTiffs == True:
         camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar, exit_event)  #Stacked tiffs by led color 

@@ -13,19 +13,20 @@ from PIL import Image
 
 # NEOAPI Baumer camera class control
 class baumerCam():
-    camera = None
-    stop = False
-    deque = None
-    imgType = 8
 
     def __init__(self, deque_size=50 ):
+        self.camera = None
+        self.stop = False
+        self.deque = None
+        self.imgType = 8  
+
         #object to que the frames
         self.deque = deque(maxlen=deque_size)
 
         self.get_frame_thread = Thread(target=self.get_frame, args=())
         self.get_frame_thread.daemon = True
 
-    def initCam(self):
+    def initCam(self, imgType=8):
         self.camera = neoapi.Cam()
         self.camera.Connect()
         self.setAutoExposure(True)
@@ -33,6 +34,8 @@ class baumerCam():
         # self.get_minmax_gain()
         self.camera.SetSynchronFeatureMode(True)
         self.startCaptureLoop()
+        self.imgType = imgType  # TODO set the camera pixelFormat as 12 bit
+         
 
     def setExposure(self, value):
         self.setAutoExposure(False)  #auto exposure needs to be disabled
@@ -96,6 +99,7 @@ class baumerCam():
 
     #saves a single taken frame in a file FAKE method 
     #only takes a single frame from the video stream
+    #camera imgType is ignored here. Captures are taken with the given imgType
     def takeSingleShoot(self, path, filename, drops=3, rot=False):
         # New "optimized" version
         fullpath = path + os.path.sep + filename

@@ -13,15 +13,16 @@ from control.asioCam import asioCam              #class to control the ZWO camer
 from control.baumerCam import baumerCam          #class to control the Baumer camera
 
 class camWrap():
-    cam = None
-    camType = 'zwo'
-    zwoMini = False
-    rootPath = ""
-    cubeIndex = 0
-    cubePaths = None
-    cubeFiles = None
 
     def __init__(self):
+        self.cam = None
+        self.camType = 'zwo'
+        self.zwoMini = False
+        self.rootPath = ""
+        self.cubeIndex = 0
+        self.cubePaths = None
+        self.cubeFiles = None
+
         #check OS 
         if platform == 'win32':  #If Windows select the camera type manually
             self.camType =  'zwo'
@@ -49,7 +50,7 @@ class camWrap():
             self.setRootPath()
         else:
             self.cam = baumerCam()
-            self.cam.initCam()
+            self.cam.initCam(imgType=8)
 
             self.setRootPath()
 
@@ -89,7 +90,7 @@ class camWrap():
         stdout = stdout.decode('utf-8')
         if stderr == None and stdout.find('2825:0157') != -1:
             print ("Baumer camera found.")
-            return ['zwo',False]  #baumer found
+            return ['baumer',False]  #baumer found
 
 
         print ("ERROR: No Baumer or ZWO cameras found")
@@ -176,7 +177,10 @@ class camWrap():
               
     # Exposure must be given in milliseconds
     def set_exposure(self, value):
-        self.cam.setExposure(value, 'ns')
+        if self.camType == 'zwo':
+            self.cam.setExposure(value, 'ns')
+        else:
+            self.cam.setExposure(value)
         
     # Gain must be given in a range between 0 to 100 (auto converts for Baumer)
     def set_gain(self, value):
