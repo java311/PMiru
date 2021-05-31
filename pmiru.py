@@ -241,7 +241,8 @@ class ConfigScreen(Screen):
         else: 
             #update the GUI values 
             self.exposure = camWrap.get_exposure()  #in milliseconds 
-            print (self.exposure)
+            if self.exposure > self.ids.exp_slider.max: #awfull bug fix for gain exp slider bug
+                self.ids.exp_slider.max = self.exposure
             self.ids.exp_slider.value = self.exposure
             # self.ids.exp_range_select.disabled = False
             self.ids.exp_slider.disabled = False

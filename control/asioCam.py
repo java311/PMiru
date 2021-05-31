@@ -153,8 +153,8 @@ class asioCam():
                                 auto=True)
 
         # Keep max gain to the default but allow exposure to be increased to its maximum value if necessary
-        # self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
-        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
+        self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], controls['AutoExpMaxExpMS']['MaxValue'])
+        # self.camera.set_control_value(controls['AutoExpMaxExpMS']['ControlType'], 2000000)  # Set MAX exposure time to 2 seconds
 
         print('Waiting for auto-exposure to compute correct settings ...')
         sleep_interval = wait  #0.100 original value
@@ -163,7 +163,7 @@ class asioCam():
         exposure_last = None
         m_threshold = 5
         median_last = 0
-        # min_median = 15
+        # min_median = 8
         # max_median = 200
         matches = 0
         self.getMedianRawShoot(drops,0)   #drop some frames before taking real values
@@ -182,7 +182,7 @@ class asioCam():
                             exposure=settings['Exposure'],
                             median=median,
                             df=df))
-                    if abs(median - median_last) < m_threshold and median > min_median and median < max_median:
+                    if abs(median - median_last) < m_threshold:  # and median > min_median and median < max_median:
                         matches += 1
                     else:
                         matches = 0
