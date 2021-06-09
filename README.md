@@ -13,18 +13,21 @@ The other power supply must be connected to the first control board. This power 
 #### **Graphical User Interface**
 The sofware has 3 diffrent screens.
 
-* Camera screen
+**Camera screen**
+
 ![](https://i.ibb.co/w7FWXK0/2021-06-09-154430-720x480-scrot.png)
 This is the principal screen where you can take pictures and see the camera output. 
 
-* Viewer screen
+**Viewer screen**
+
 ![](https://i.ibb.co/jWS7YvJ/2021-06-09-154510-720x480-scrot.png)
 In this screen you can navigate that the camera has taken
 
-* Configuration screen
+**Configuration screen**
+
 ![](https://i.ibb.co/C26P1VS/2021-06-09-154457-720x480-scrot.png)
-You can configure the Exposure and Gain values of the camera screen. 
-From here you can also execute the auto calibration. To normalize the exposure levels of each color. 
+In this screen, you can configure the Exposure and Gain values of the camera viewer. 
+From here you can also execute the auto calibration, to normalize the exposure levels for all the light wavelenghts.
 
 #### **Exposure levels calibration** 
 The exposure and gain levels of the camera MUST be calibrated everytime the light conditions change. 
@@ -46,10 +49,60 @@ Sometimes is easier to operate the camera with monitor, keyboard and mouse. Just
 To do so, BEFORE turning on the camera, connect the monitor using mini HMDI cable. Also connect
 a keyboard and mouse to the USB ports. 
 
-Note. Bluethooht mouse and keyboard are NOT recommended. To many periferals connected to the Raspberry will cause power supply failures. (slow wifi, slow processor, camera failure)
+( Note. Bluethooth mouse and keyboard are NOT recommended. To many periferals connected to the Raspberry will cause power supply failures, like: slow wifi, slow processor, camera failure.)
+
+Then you have to:
+
+1. Disable the touchscreen input
+Then you have to disable the touch commands of the touchscreen. To do so edit the Kivy's config file located in: `/home/pi/PMiru/.kivy/config.ini`. For this you can open the Text Editor from `Menu.. Accesories... Text Editor`. Then find the lines responsible for touch and add a `#` at the beginning to comment them. 
+```
+[input]
+mouse = mouse
+#Touchscreen function for 270 degrees orientation
+#mtdev_%(name)s = probesysfs,provider=mtdev
+#hid_%(name)s = probesysfs,provider=hidinput,param=rotation=270,param=invert_y=1
+```
+Then save the changes and reboot.
+
+2. Fix the screen orientation
+If the image in the monitor is upside down. To flip the image you need to reconfigure the Raspberry monitor output by executing the following commands: 
+```
+cd /home/pi/
+cd Raspberry-Pi-Installer-Scripts
+sudo python3 adafruit-pitft.py
+```
+
+This will run the touchscreen configuration script. With the keyboard select the following options:
+```
+[4] [90 degrees] [No] [Yes] and then reboot. 
+```
+After the reboot the screen in the monitor should be correct but in the touchscreen it will be upsidedown. 
 
 #### **Use the camera with touch screen only** 
-This is the easier way to use the camera. Just turn it on and operate it with the touchscreen. 
+If you want to use the camera with touchscreen. You must:
+1. Enable the touchscreen input
+To enable the touch commands of the touchscreen. To do so edit the Kivy's config file located in: `/home/pi/PMiru/.kivy/config.ini`. For this you can open the Text Editor from `Menu.. Accesories... Text Editor`. Then find the lines responsible for touch and erase the `#` at the beginning to uncomment them. 
+```
+[input]
+mouse = mouse
+#Touchscreen function for 270 degrees orientation
+mtdev_%(name)s = probesysfs,provider=mtdev
+hid_%(name)s = probesysfs,provider=hidinput,param=rotation=270,param=invert_y=1
+```
+
+2. Fix the screen orientation
+If the image in the monitor is upside down. To flip the image you need to reconfigure the Raspberry monitor output by executing the following commands: 
+```
+cd /home/pi/
+cd Raspberry-Pi-Installer-Scripts
+sudo python3 adafruit-pitft.py
+```
+
+This will run the touchscreen configuration script. With the keyboard select the following options:
+```
+[4] [270 degrees] [No] [Yes] and then reboot. 
+```
+After the reboot the screen in the touchscreen should be correct but in the monitor it will be upsidedown. 
 
 #### How to transfer the photos to my PC ?
 1. The easiest way is to connect a USB thumbdrive or harddrive to the Raspberry. Then use 
@@ -137,7 +190,7 @@ So, it must be connected the following way:
 
 #### **Camera connection**
 The camera is connected using a USB 2 or USB 3 cable. 
-Just follow the colors in the ports. Very easy. 
+Even your grandpa can do this. 
 
 ### How to edit the config.json file 
 TODO 
