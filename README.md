@@ -16,16 +16,19 @@ The sofware has 3 diffrent screens.
 **Camera screen**
 
 ![](https://i.ibb.co/w7FWXK0/2021-06-09-154430-720x480-scrot.png)
+
 This is the principal screen where you can take pictures and see the camera output. 
 
 **Viewer screen**
 
 ![](https://i.ibb.co/jWS7YvJ/2021-06-09-154510-720x480-scrot.png)
+
 In this screen you can navigate that the camera has taken
 
 **Configuration screen**
 
 ![](https://i.ibb.co/C26P1VS/2021-06-09-154457-720x480-scrot.png)
+
 In this screen, you can configure the Exposure and Gain values of the camera viewer. 
 From here you can also execute the auto calibration, to normalize the exposure levels for all the light wavelenghts.
 
@@ -114,6 +117,34 @@ Take the SD card from the bottom of the Raspberry PI and insert in your PC.
 In Windows you can use Ext2explore ( https://sourceforge.net/projects/ext2read/files/Ext2read%20Version%202.2%20%28Latest%29/ ) to navigate SD card 
 and copy the pictures from `/home/pi/PMiru/captures` to your PC. 
 
+### Factory Reset
+A factory reset **erases all the files in the SD card** and installs PMiru Raspberry image.
+
+1. For this you need to download the **LAST** Raspberry PMiru image file from: https://drive.google.com/drive/folders/1k8Ksq4PHny_fg9CTCQ2_meRpxVSobsXU?usp=sharing 
+
+2. Insert the SD-card of the camera and instert it into your PC.
+
+3. Then Launch the **Raspberry Pi Imager**. You can download and install Raspberry Pi Imager from: https://www.raspberrypi.org/software/ 
+![](https://cdn.mos.cms.futurecdn.net/eFY75unD84ca8bHKnfQcWV-970-80.png.webp)
+
+4. Select **Use custom** from Choose OS menu. 
+
+![](https://cdn.mos.cms.futurecdn.net/ygsJmreLqjjGaQV8iwToZL-970-80.png.webp)
+
+5. Select the image file you downloaded. 
+
+![](https://cdn.mos.cms.futurecdn.net/An6ywCxhmzHHp8v2T2KGGh-970-80.png.webp)
+
+6. Select the micro SD card you wish to burn it to. 
+
+![](https://cdn.mos.cms.futurecdn.net/An6ywCxhmzHHp8v2T2KGGh-970-80.png.webp)
+
+7. Click Write and wait. 
+
+![](https://cdn.mos.cms.futurecdn.net/a7bR7hTEeAKtrq8KXXeDbn-970-80.png.webp)
+
+8. Once it finish put the SD card back to the camera's Raspberry.  
+
 ### How to connect the camera
 
 #### **Touch Screen connections**
@@ -129,7 +160,7 @@ Here are the PINs configuration:
 LCD PIN numbers are the same as the Raspberry. 
 Just check the orientation of the LCD PIN slot, it is designed to cover all the Raspberry output pins.
 
-![](https://i.ibb.co/m00sgT8/pitft-pinout.png)
+![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
 
 #### **LED control boards connections (Amperka)**
 The camera has two control boards to control the LEDs. This is where the cables from the 
@@ -217,5 +248,6 @@ Another solution, could be to avoid the usage of this light by editing Pmiru's `
 #### **When taking photos the progress bar restarts several times** 
 That is normal. After all the photos are taking the camera also create the stacked tiff files for each wavelenght. 
 This could take even longer than the capture process. If you do not want to use stacked tiff files, you can edit Pmiru's `config.json` file. 
+
 
  
