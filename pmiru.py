@@ -440,6 +440,7 @@ def takeHyperCube():
             exp_gain = leds.getColorExpGain(camType=camWrap.camType, index=color)
             camWrap.set_exposure(exp_gain[0])
             camWrap.set_gain(exp_gain[1])
+            time.sleep(2) #Wait for the exposure to adjust (BUGFIX)
             fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname, drops=3, rot=rotateImages )
             leds.colorOnOff(color, False)  # Turn lights OFF
