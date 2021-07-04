@@ -177,7 +177,7 @@ class asioCam():
             if df != df_last:
                 if with_median == True: #Hack added to calibrate the camera with median instead of exposure/gain
                     median = self.getMedianRawShoot(0,1)
-                    print('   Gain {gain:d}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:d}'
+                    print('   Gain {gain:d}  Exposure: {exposure:d} Median: {median:f} Dropped frames: {df:d}'
                     .format(gain=settings['Gain'],
                             exposure=settings['Exposure'],
                             median=median,
@@ -189,7 +189,7 @@ class asioCam():
                     if matches >= good_frames: #5 original value
                         break
                 else:
-                    print('   Gain {gain:d}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:d}'
+                    print('   Gain {gain:d}  Exposure: {exposure:d} Median: {median:f} Dropped frames: {df:d}'
                     .format(gain=settings['Gain'],
                             exposure=settings['Exposure'],
                             median=median,
@@ -213,29 +213,27 @@ class asioCam():
 
         # print('Use maximum USB Bandwidth')
         # self.camera.set_control_value(asi.ASI_BANDWIDTHOVERLOAD, self.camera.get_controls()['BandWidth']['MaxValue'])
-
-        return [self.exposure, self.gain, self.median]
+        return [self.exposure, self.gain, self.median]  # return in ms, %, raw median
 
     # Set the manual exposure value 
-    def setExposure(self, expValue, toUnits='ns'):
+    def setExposure(self, expValue, units='ns'):
         # Disable auto exposure
         self.autoExp = False
         self.setAutoExposure(False)
 
-        # Converts milliseconsd to microseconds
-        if (toUnits == 'ns'): 
-            expValue = int(expValue * 1000)
+        if units == 'ns':
+            expValue = expValue * 1000000 #convert ms to nanoseconds
 
-        self.camera.set_control_value(asi.ASI_EXPOSURE, expValue)
-        return 
+        print ("Set exposure to: " + str(int(expValue)))
+        self.camera.set_control_value(asi.ASI_EXPOSURE, int(expValue))  #this value MUST be integer (bugfix)
 
     #Manually set the gain of the camera 
     def setGain(self, gainValue):
         self.autoGain = False
         self.setAutoGain(False)
 
+        print ("Set gain to: " + str(int(gainValue)))
         self.camera.set_control_value(asi.ASI_GAIN, int(gainValue))
-        return
 
     # Starts the capture daemon
     def startCaptureLoop(self):
@@ -264,7 +262,6 @@ class asioCam():
                 else:
                     rawImg = np.frombuffer(raw, dtype=np.uint16)
                 rawImg = rawImg.reshape(shape)
-    
                 # show = cv2.resize(rawImg, (800, 600))  # OPENCV DEBUG
                 # show = cv2.cvtColor(show,cv2.COLOR_GRAY2RGB)             #OPENCV DEBUG
 
@@ -335,6 +332,7 @@ class asioCam():
 
         # Drop several frames before taking the GOOD one
         for i in range(drops):
+            print ("Dropping frame ... " + str(i))
             self.camera.get_video_data(timeout=self.timeout)
 
         # this is the GOOD one

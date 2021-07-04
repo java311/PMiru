@@ -3,9 +3,11 @@
   {
    "wheel": false,
    "maximized": false,
-   "stacks": true,
-   "rotate": false,
-   "motor_angles": [-144, -99, -54, -9, 36]
+   "stacks": false,
+   "rotate": true,
+   "start_angle": 46,
+   "step_angle": 15,
+   "step_calib": 5
   }
  ],
  "lights": [
@@ -13,62 +15,62 @@
    "channel": 0,
    "device": 0,
    "wavelenght": 590,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 185.883,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 1,
    "device": 0,
    "wavelenght": 400,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 902.658,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 2,
    "device": 0,
    "wavelenght": 8000,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 110.079,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 3,
    "device": 0,
    "wavelenght": 620,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 49.84,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 4,
    "device": 0,
    "wavelenght": 520,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 115.225,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 5,
    "device": 0,
    "wavelenght": 460,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 232.407,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 6,
    "device": 0,
    "wavelenght": 390,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
    "baumer-exp": 1000.0,
    "baumer-gain": 9.98828125
   },
@@ -76,36 +78,36 @@
    "channel": 7,
    "device": 0,
    "wavelenght": 660,
-   "zwo-exp": 10.85,
-   "zwo-gain": 200.0,
-   "baumer-exp": 47.937,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 0,
    "device": 1,
    "wavelenght": 740,
-   "zwo-exp": 7.224,
-   "zwo-gain": 188.0,
-   "baumer-exp": 50.336,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   },
   {
    "channel": 1,
    "device": 1,
    "wavelenght": 850,
-   "zwo-exp": 6.809,
-   "zwo-gain": 196.0,
-   "baumer-exp": 1000.0,
-   "baumer-gain": 9.98828125
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
+   "baumer-gain": 1.0
   },
   {
    "channel": 2,
    "device": 1,
    "wavelenght": 940,
-   "zwo-exp": 6.178,
-   "zwo-gain": 196.0,
-   "baumer-exp": 43.014,
+   "zwo-exp": 0.304382,
+   "zwo-gain": 50.0,
+   "baumer-exp": 93.875,
    "baumer-gain": 1.0
   }
  ]

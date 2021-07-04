@@ -65,6 +65,7 @@ class CameraScreen(Screen):
         self.image_name = ""
         self._lock = threading.Lock()
         self.lightON = False
+        self.start_angle = 0
 
     #clock to refresh the camera live feed
     def cameraRefreshCallback(self, dt=0):
@@ -115,11 +116,35 @@ class CameraScreen(Screen):
         before_destroy()
         sys.exit(0)
 
-    def rotate_press(self):
-        motor.moveToNextAngle()
+    def normal_rotation_press(self):
+        a_index = motor.moveToNextAngle()
+        self.ids.angle_txt.text = format(motor.getAngle(a_index), '02d') + "°"
+
+    def rotate_up_press(self):
+        self.start_angle = motor.moveCalibAngle(up=True)
+        self.ids.angle_txt.text = str(self.start_angle) + "°"
+
+    def rotate_down_press(self):
+        self.start_angle = motor.moveCalibAngle(up=False)
+        self.ids.angle_txt.text = str(self.start_angle) + "°"
 
     def lighton_press(self):
         leds.rotateLight()
+
+    def save_angle_press(self):
+        motor.initAngles(self.start_angle, motor.step_angle) # Fuataba servo angle CAN go from -144 to 144 
+
+        #Save obtained auto exposure and gain values in the config JSON file
+        json_cfg = None
+        with open('config.json', 'r') as cfile:   #read JSON
+            json_cfg = json.load(cfile)
+
+        json_cfg['config'][0]['start_angle'] = self.start_angle  # Edit JSON
+
+        with open('config.json', 'w') as cfile:   #save JSON
+            print ("Dumping JSON file...")
+            json.dump(json_cfg, cfile, indent=1)
+        print ("Start angle saved in JSON file...")
 
     def hide_progress_bar(self, dohide=True):
         wid = self.ids.prog_bar
@@ -241,6 +266,7 @@ class ConfigScreen(Screen):
         else: 
             #update the GUI values 
             self.exposure = camWrap.get_exposure()  #in milliseconds 
+            print (self.exposure)
             if self.exposure > self.ids.exp_slider.max: #awfull bug fix for gain exp slider bug
                 self.ids.exp_slider.max = self.exposure
             self.ids.exp_slider.value = self.exposure
@@ -314,6 +340,7 @@ class ConfigScreen(Screen):
         calibThread = threading.Thread(target=runLightCalibration)
         calibThread.start()
 
+
 class PmiruApp(App):
     def build(self):
         global sm 
@@ -321,7 +348,7 @@ class PmiruApp(App):
         sm.add_widget(CameraScreen(name='camera'))
         sm.add_widget(ConfigScreen(name='config'))
         sm.add_widget(ViewerScreen(name='viewer'))
-
+        
         Window.size = (wSizeX, wSizeY)
         Window.bind(on_resize=self.check_resize)
         Window.fullscreen = maximizeStart #Maximizes Kivy Window
@@ -333,6 +360,8 @@ class PmiruApp(App):
         if sm.current == 'camera':
             Clock.schedule_interval(sm.get_screen("camera").cameraRefreshCallback, 0.01)
         sm.get_screen("camera").hide_progress_bar(True)
+
+        sm.get_screen("camera").ids.angle_txt.text = str(motor.start_angle) + "°"
 
     # Called when kivy application is correctly closed
     def on_stop(self, **kwargs):
@@ -375,9 +404,9 @@ def runLightCalibration():
         leds.colorOnOff(color, True)  # Turn on each LED
         
         egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, drops=5, good_frames=3) #calibrate with median, return exp,gain,median
-        autoExpVals.append(egm[0]/1000.0)
-        autoGainVals.append(egm[1]/1.0)
-        autoMedVals.append(egm[2])
+        autoExpVals.append(egm[0]/1000000)   # save exposure in ms
+        autoGainVals.append(egm[1]/1)   # gain %
+        autoMedVals.append(egm[2])     # raw median value
 
         leds.colorOnOff(color, False)  # Turn off each LED
 
@@ -431,6 +460,7 @@ def takeHyperCube():
     sm.get_screen("camera").ids.shoot_btn.disabled = True
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
+        sm.get_screen("camera").ids.angle_txt.text = format(motor.getAngle(angle), '02d') + "°"
         for color in range(0,leds.nColors): # For each color
             if exit_event.is_set():
                 print ("Capture thread killed...")
@@ -482,7 +512,10 @@ if __name__ == "__main__":
             maximizeStart = c['maximized'] 
             stackedTiffs = c['stacks']
             rotateImages = c['rotate']
-            motor_angles = c['motor_angles']
+            start_angle = c['start_angle']
+            step_angle = c['step_angle']
+            step_calib = c['step_calib']
+
     
     # Check cmd line arguments
     parser = argparse.ArgumentParser(prog="pmiru")
@@ -501,9 +534,12 @@ if __name__ == "__main__":
 
     #Init Motor control object
     motor = Motor() 
-    motor.initAngles(motor_angles) # Fuataba servo angle CAN go from -144 to 144
-    motor.movetoInit() 
+    motor.initAngles(start_angle, step_angle) # Fuataba servo angle CAN go from -144 to 144 
 
+    #calib from -144 to 144 value
+    motor.initCalibAngles(step_calib)
+    motor.movetoInit()
+    
     #In case you want to use the filter wheel
     # if enableWheel:
     #     wheel = WheelControl()

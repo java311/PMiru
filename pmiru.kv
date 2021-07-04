@@ -22,20 +22,45 @@
             pos_hint: {"right": 0.15, 'top':1}
             on_release: root.screen_change('viewer')
         ActionButton:
+            icon: 'led_red.png'
+            size_hint: 0.13, 0.13
+            pos_hint: {"right": 0.55, 'top':1}
+            on_release: root.lighton_press()
+        ActionButton:
             icon: 'exit_red.png'
             size_hint: 0.13, 0.13
             pos_hint: {"x": 0, 'down':0.9}
             on_release: root.exit_press()
         ActionButton:
-            icon: 'rotate_red.png'
-            size_hint: 0.12, 0.12
+            icon: 'up_red.png'
+            size_hint: 0.13, 0.13
             pos_hint: {"right": 1, 'down':0.9}
-            on_release: root.rotate_press()
+            on_release: root.rotate_up_press()
         ActionButton:
-            icon: 'led_red.png'
+            icon: 'down_red.png'
+            size_hint: 0.13, 0.13
+            pos_hint: {"right": 0.9, 'down':0.9}
+            on_release: root.rotate_down_press()
+        ActionButton:
+            icon: 'save_red.png'
             size_hint: 0.13, 0.13
             pos_hint: {"right": 1, 'top':0.3}
-            on_release: root.lighton_press()
+            on_release: root.save_angle_press()
+        ActionButton:
+            icon: 'rotate_red.png'
+            size_hint: 0.13, 0.13
+            pos_hint: {"right": 0.65, 'top':1}
+            on_release: root.normal_rotation_press()
+
+        Label:
+            id: angle_txt
+            text: '333'
+            color: 1, 0, 0, 1 #red
+            size_hint: 0.1, 0.1
+            bold: True
+            font_size: '20sp'
+            pos_hint: {"right": 0.85, 'top':0.3}
+
         ProgressBar:
             id: prog_bar
             min: 0 
@@ -261,3 +286,4 @@
                 text: 'My settings button'
                 icon: 'right_red.png'
                 size_hint: 0.7, 0.7
+            #    on_release: root.screen_change('motor_config')

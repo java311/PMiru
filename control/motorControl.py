@@ -6,7 +6,9 @@ class Motor():
         self.PIN = gpio_pin
         self.pi = pigpio.pi()
         self.pi.set_mode(self.PIN, pigpio.OUTPUT)
+        self.start_angle = 0
         self.index = 0
+        self.calib_index = 0
 
     #For Fuataba angle goes from -144 to 144
     def moveTo(self, angle, sleep=0.3):
@@ -15,9 +17,20 @@ class Motor():
         self.pi.hardware_PWM(self.PIN, 50, duty )  # Changing the Duty Cycle to rotate the motor   
         time.sleep(sleep) 
 
-    #alist MUST be a list of integers 
-    def initAngles(self, alist):
-        self.angleList = alist
+    #receives the start and step to build angles list
+    def initAngles(self, start_angle, step_angle):
+        self.start_angle = start_angle
+        self.step_angle = step_angle
+        motor_angles = range(self.start_angle, 144, self.step_angle)
+        self.angleList = motor_angles
+
+    def initCalibAngles(self, step_calib):
+        calib_angles = range(-144,144,step_calib)
+        self.calibAngles = calib_angles
+        for i,a in enumerate(self.calibAngles):
+            if a >= self.start_angle:
+                self.calib_index = i
+                break
 
     def movetoInit(self):
         self.moveTo(self.angleList[0])
@@ -35,7 +48,22 @@ class Motor():
 
         self.moveTo(self.angleList[self.index])
         return self.index
-    
+
+    # Moves the lens in small steps to calibrate the camera
+    def moveCalibAngle(self, up, sleep=0.3):
+        if up == True: 
+            self.calib_index =  self.calib_index + 1
+        else:
+            self.calib_index =  self.calib_index - 1
+
+        if self.calib_index == len(self.calibAngles):
+            self.calib_index = 0
+        if self.calib_index < 0:
+            self.calib_index = len(self.calibAngles) -1
+
+        self.moveTo(self.calibAngles[self.calib_index])
+        return self.calibAngles[self.calib_index]
+
     def getNumAngles(self):
         return len(self.angleList)
 

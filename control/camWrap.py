@@ -157,11 +157,15 @@ class camWrap():
 
         self.cam.changeImgType(imgType)
             
-    # returns the camera exposure in ms
+    # returns the camera exposure in ms (used only to update the inteface)
     def get_exposure(self):
         if self.camType == 'zwo':
             if self.zwoMini:
-                return int(self.cam.getExposure())
+                # return int(self.cam.getExposure())
+                exp_ms = int(self.cam.getExposure()/1000000)  #convert to ms
+                if exp_ms <= 0:
+                    exp_ms = 1
+                return exp_ms
             else:
                 return int(self.cam.getExposure()/1000.0)  
         else:
@@ -169,7 +173,6 @@ class camWrap():
 
     def get_gain(self):
         if self.camType == 'zwo':
-            # return self.cam.gain
             return self.cam.getGain()
         else:
             r = self.cam.get_gain() #range [0,10]
