@@ -7,6 +7,7 @@ class Motor():
         self.pi = pigpio.pi()
         self.pi.set_mode(self.PIN, pigpio.OUTPUT)
         self.start_angle = 0
+        self.stop_angle = 0
         self.index = 0
         self.calib_index = 0
 
@@ -18,15 +19,14 @@ class Motor():
         time.sleep(sleep) 
 
     #receives the start and step to build angles list
-    def initAngles(self, start_angle, step_angle):
+    def initAngles(self, start_angle, stop_angle, step_angle):
         self.start_angle = start_angle
+        self.stop_angle = stop_angle
         self.step_angle = step_angle
-        motor_angles = range(self.start_angle, 144, self.step_angle)
-        self.angleList = motor_angles
+        self.angleList = range(self.start_angle, self.stop_angle, self.step_angle)
 
     def initCalibAngles(self, step_calib):
-        calib_angles = range(-144,144,step_calib)
-        self.calibAngles = calib_angles
+        self.calibAngles = range(-144,144,step_calib)
         for i,a in enumerate(self.calibAngles):
             if a >= self.start_angle:
                 self.calib_index = i
@@ -67,8 +67,11 @@ class Motor():
     def getNumAngles(self):
         return len(self.angleList)
 
-    def getAngle(self,index):
-        return self.angleList[index]
+    # Returns real polarizer angle in a string for the image name format
+    def getRealAngle(self,index):
+        return format( self.angleList[index] - self.start_angle , '02d')
+        # return self.angleList[index] - start_angle
+        # return self.angleList[index]
 
     def __del__(self):
         self.pi.set_mode(self.PIN, pigpio.INPUT)

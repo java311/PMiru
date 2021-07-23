@@ -79,7 +79,7 @@ This will run the touchscreen configuration script. With the keyboard select the
 ```
 [4] [90 degrees] [No] [Yes] and then reboot. 
 ```
-After the reboot the screen in the monitor should be correct but in the touchscreen it will be upsidedown. 
+After the reboot the screen in the monitor should be correct. But the image in the touchscreen will be upsidedown. 
 
 #### **Use the camera with touch screen only** 
 If you want to use the camera with touchscreen. You must:
@@ -116,6 +116,17 @@ Take the SD card from the bottom of the Raspberry PI and insert in your PC.
 
 In Windows you can use Ext2explore ( https://sourceforge.net/projects/ext2read/files/Ext2read%20Version%202.2%20%28Latest%29/ ) to navigate SD card 
 and copy the pictures from `/home/pi/PMiru/captures` to your PC. 
+
+### How to update P-Miru from github
+The easiest way to update P-Miru software is to do it from the github repository: `https://github.com/java311/PMiru`.
+
+To do it you must open a terminal and type the following commands:
+```
+cd /home/pi/PMiru
+git checkout
+git pull origin master
+```
+Then you will be asked for a login and password. Ask the slack channel to get those.
 
 ### Factory Reset
 A factory reset **erases all the files in the SD card** and installs PMiru Raspberry image.

@@ -6,6 +6,7 @@
    "stacks": false,
    "rotate": true,
    "start_angle": 46,
+   "stop_angle": 144,
    "step_angle": 15,
    "step_calib": 5
   }
@@ -15,7 +16,7 @@
    "channel": 0,
    "device": 0,
    "wavelenght": 590,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.508085,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -24,7 +25,7 @@
    "channel": 1,
    "device": 0,
    "wavelenght": 400,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 1.129327,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -33,7 +34,7 @@
    "channel": 2,
    "device": 0,
    "wavelenght": 8000,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.357559,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -42,7 +43,7 @@
    "channel": 3,
    "device": 0,
    "wavelenght": 620,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.276067,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -51,7 +52,7 @@
    "channel": 4,
    "device": 0,
    "wavelenght": 520,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.539444,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -60,7 +61,7 @@
    "channel": 5,
    "device": 0,
    "wavelenght": 460,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.841254,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -69,7 +70,7 @@
    "channel": 6,
    "device": 0,
    "wavelenght": 390,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 1.218251,
    "zwo-gain": 50.0,
    "baumer-exp": 1000.0,
    "baumer-gain": 9.98828125
@@ -78,7 +79,7 @@
    "channel": 7,
    "device": 0,
    "wavelenght": 660,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.252262,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -87,7 +88,7 @@
    "channel": 0,
    "device": 1,
    "wavelenght": 740,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.252262,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -96,7 +97,7 @@
    "channel": 1,
    "device": 1,
    "wavelenght": 850,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.252262,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0
@@ -105,7 +106,7 @@
    "channel": 2,
    "device": 1,
    "wavelenght": 940,
-   "zwo-exp": 0.304382,
+   "zwo-exp": 0.252262,
    "zwo-gain": 50.0,
    "baumer-exp": 93.875,
    "baumer-gain": 1.0

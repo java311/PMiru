@@ -118,7 +118,7 @@ class CameraScreen(Screen):
 
     def normal_rotation_press(self):
         a_index = motor.moveToNextAngle()
-        self.ids.angle_txt.text = format(motor.getAngle(a_index), '02d') + "°"
+        self.ids.angle_txt.text = motor.getRealAngle(a_index) + "°"
 
     def rotate_up_press(self):
         self.start_angle = motor.moveCalibAngle(up=True)
@@ -460,7 +460,7 @@ def takeHyperCube():
     sm.get_screen("camera").ids.shoot_btn.disabled = True
     for angle in range(0,nAngles): # For each angle
         motor.moveToAngle(angle) # Move the motor to the next angle
-        sm.get_screen("camera").ids.angle_txt.text = format(motor.getAngle(angle), '02d') + "°"
+        sm.get_screen("camera").ids.angle_txt.text = motor.getRealAngle(angle) + "°"
         for color in range(0,leds.nColors): # For each color
             if exit_event.is_set():
                 print ("Capture thread killed...")
@@ -471,7 +471,7 @@ def takeHyperCube():
             camWrap.set_exposure(exp_gain[0])
             camWrap.set_gain(exp_gain[1])
             time.sleep(2) #Wait for the exposure to adjust (BUGFIX)
-            fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + format(motor.getAngle(angle), '02d') + ".tiff"
+            fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + motor.getRealAngle(angle) + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname, drops=3, rot=rotateImages )
             leds.colorOnOff(color, False)  # Turn lights OFF
             
@@ -513,6 +513,7 @@ if __name__ == "__main__":
             stackedTiffs = c['stacks']
             rotateImages = c['rotate']
             start_angle = c['start_angle']
+            stop_angle = c['stop_angle']
             step_angle = c['step_angle']
             step_calib = c['step_calib']
 
@@ -534,7 +535,7 @@ if __name__ == "__main__":
 
     #Init Motor control object
     motor = Motor() 
-    motor.initAngles(start_angle, step_angle) # Fuataba servo angle CAN go from -144 to 144 
+    motor.initAngles(start_angle, stop_angle, step_angle) # Fuataba servo angle CAN go from -144 to 144 
 
     #calib from -144 to 144 value
     motor.initCalibAngles(step_calib)
