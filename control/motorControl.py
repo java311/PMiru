@@ -69,7 +69,7 @@ class Motor():
 
     # Returns real polarizer angle in a string for the image name format
     def getRealAngle(self,index):
-        return format( 90 + (self.angleList[index] - self.start_angle) , '02d')
+        return format(90 + (self.angleList[index] - self.start_angle) , '02d')
         # return self.angleList[index] - start_angle
         # return self.angleList[index]
 
