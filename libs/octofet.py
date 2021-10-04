@@ -50,7 +50,8 @@ class Octofet:
         self._data = [0x00] * self._device_count
         # Create an SPI object on the "0" SPI bus and connected to "pin_CE".
         self._spi = self._spi_init(bus, pin_CE)
-        self._spi.writebytes(self._data)
+        # self._spi.writebytes(self._data)      # this function has a bugq
+        self._spi.xfer(self._data)    # py-spidev Bugfix
 
     def digital_write(self, channel, value, device=0):
         """Sets the state ("on" or "off") of one power switch.
@@ -74,7 +75,8 @@ class Octofet:
         else:
             self._data[device] &= ~(1 << channel) & 0xFF
 
-        self._spi.writebytes(self._data[::-1])
+        # self._spi.writebytes(self._data[::-1])    # this function has a bug
+        self._spi.xfer(self._data[::-1])     # py-spidev Bugfix
 
     def digital_write_all(self, value, device=0):
         """Sets the state ("on" or "off") of all power switches at once.
@@ -98,7 +100,8 @@ class Octofet:
                 state &= ~(1 << i) & 0xFF
         self._data[device] = state
 
-        self._spi.writebytes(self._data[::-1])
+        # self._spi.writebytes(self._data[::-1])    # this function has a bug
+        self._spi.xfer(self._data[::-1])     # py-spidev Bugfix
 
     def get_channel_state(self, channel, device=0):
         """Returns the last (i.e., current) set state for one power switch of
@@ -158,5 +161,6 @@ class Octofet:
         to close the SPI connection.
         """
         self._data = [0x00] * self._device_count
-        self._spi.writebytes(self._data)
+        # self._spi.writebytes(self._data)    # this function has a bug
+        self._spi.xfer(self._data)       # py-spidev Bugfix
         self._spi.close()
