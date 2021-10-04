@@ -38,8 +38,10 @@ class camWrap():
             lib_path = "/lib/arm-linux-gnueabihf/libASICamera2.so"  #DEFAULT OS raspbian
             if platform == 'win32':
                 lib_path = "C:\\pmiru\\software\\zwo\\ASI SDK\\lib\\x64\\ASICamera2.dll"
-            if platform == 'ubuntu':
+            elif platform == 'ubuntu':
                 lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
+            elif os.uname()[4] == 'aarch64':
+                lib_path = "/usr/lib/aarch64-linux-gnu/libASICamera2.so"
             
             if (self.cam.initCam(lib_path=lib_path, imgType=8) == True):  # default imgType 8bit 
                 self.cam.startCaptureLoop()

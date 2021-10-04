@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Python imports 
 import time
 import cv2
@@ -32,6 +33,8 @@ stackedTiffs = None # Created stacked tiff files by LED color
 rotateImages = None # Rotates images after capture
 
 # Kivy imports
+# os.environ['KIVY_GL_BACKEND'] = 'gl'  # hotfix for sdl bug
+# import kivy
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -48,7 +51,7 @@ from kivy.core.window import Window
 if enableWheel:
     from control.wheel_control import WheelControl   #class to control the wheel
 from control.camWrap import camWrap              #class to wrap ZWO and Baumer API cameras
-from control.ledControl import ledControl 
+from control.ledControl import ledControl
 from control.motorControl import Motor
 
 class FirstScreen(Screen):
@@ -119,7 +122,7 @@ class CameraScreen(Screen):
     def normal_rotation_press(self):
         a_index = motor.moveToNextAngle()
         self.ids.angle_txt.text = motor.getRealAngle(a_index) + "°"
-
+    
     def rotate_up_press(self):
         self.start_angle = motor.moveCalibAngle(up=True)
         self.ids.angle_txt.text = str(self.start_angle) + "°"
@@ -379,6 +382,7 @@ def before_destroy():
 
     if leds is not None:  #Turn lights OFF
         leds.lightsOff()
+        motor.motorOff()
 
 # NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACEN INFRONT A WHITE SCREEN OR SURFACE
 # Gain/Exposore calibration for each LED of the camera by

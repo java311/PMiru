@@ -1,10 +1,19 @@
 import time
 import json
+import os
 from libs.octofet import Octofet
+from sys import platform
 
 # TODO link the color dictionary [channel, device, index] of each color to the UI 
 class ledControl():
     def __init__(self, ceNum=2, nboards=2, bus=1):
+
+        ceNum=0; nboards=0; bus=0
+        if platform == 'ubuntu':           #For Raspberry
+            ceNum=2; nboards=2; bus=1
+        elif os.uname()[4] == 'aarch64':   #For Jetson nano
+            ceNum=0; nboards=2; bus=0
+
         # inits Octofet controler class. CE number, Number of Amperka boards, bus number (bus SPI0 or SPI1)
         self.octo = Octofet(ceNum,nboards,bus=bus)
         self.cindex = 0  # index by color 
