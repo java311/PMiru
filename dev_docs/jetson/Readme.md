@@ -96,6 +96,27 @@ After this use Jetpack script to activate PWM and SPI pins
 To activate SPI is necessary to start the spidev kernel module automatically, by adding `spidev` it to the `/etc/modules` file.
 
 
+## Connections
+
+### How to connect the PWM
+
+| Servo Motor PIN  | Jetson PIN  |
+| ------------- | ------------- |
+| 5 Volt   | PIN 4  |
+| GND   | PIN 6  |
+| COMM   | PIN 33  |
+
+### Conenct Amperka boards
+
+| Amperka  | Jetson PIN |
+| ------------- | ------------- |
+| pulse icon pin   | PIN 23  (SLCK) |
+| G (Ground) | PIN 25 (GND)  |
+| DI   | PIN 19 (MOSI SPI1) |
+| CS   | PIN 24 (SPI CS0) |
+| pin between GND and Clock (5V)   | PIN 2 (5V) |
+
+
 
 
 
