@@ -116,6 +116,16 @@ To activate SPI is necessary to start the spidev kernel module automatically, by
 | CS   | PIN 24 (SPI CS0) |
 | pin between GND and Clock (5V)   | PIN 2 (5V) |
 
+#### LED connection troubleshoot
+- Issue: Leds turn on at the same or in the wrong order
+- Fix: It is caused by a missconnection of the CS cable on the wrong pin.
+
+- Issue: Amperka LED do not turn on and also LEDs do not turn on
+- Fix: The 5V from the Jetson board is not connected to Amperka board
+
+- Issue: Amperka LED is ON but LEDs do not turn on
+- Fix: The 3.3v power supply is not connected to the Amperka board
+
 
 
 
