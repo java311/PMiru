@@ -9,7 +9,7 @@ class ledControl():
     def __init__(self, ceNum=2, nboards=2, bus=1):
 
         ceNum=0; nboards=0; bus=0
-        if platform == 'ubuntu':           #For Raspberry
+        if os.uname()[4] == 'armv7l':           #For Raspberry 4B
             ceNum=2; nboards=2; bus=1
         elif os.uname()[4] == 'aarch64':   #For Jetson nano
             ceNum=0; nboards=2; bus=0
