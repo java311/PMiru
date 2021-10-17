@@ -28,7 +28,8 @@ exit_event = threading.Event()  # Event to kill capture and calib threads
 # PROGRAM CONTROL FLAGS
 # These flags are populated with config.json file
 enableWheel = None  # Enables the use of the wheel (deprecated)
-maximizeStart = None # Starts kivy maximized or not 
+fullscreenStart = None # Starts kivy on full screen
+maximizeStart = None  # Starts kivy in a maximized window
 stackedTiffs = None # Created stacked tiff files by LED color
 rotateImages = None # Rotates images after capture
 
@@ -354,8 +355,10 @@ class PmiruApp(App):
         
         Window.size = (wSizeX, wSizeY)
         Window.bind(on_resize=self.check_resize)
-        Window.fullscreen = maximizeStart #Maximizes Kivy Window
-
+        Window.fullscreen = fullscreenStart #Maximizes Kivy Window
+        if maximizeStart == True:
+            Window.maximize()
+            
         return sm
 
     # Called when the kivy application starts
@@ -514,6 +517,7 @@ if __name__ == "__main__":
         for c in cfg['config']:
             enableWheel = c['wheel']
             maximizeStart = c['maximized'] 
+            fullscreenStart = c['fullscreen']
             stackedTiffs = c['stacks']
             rotateImages = c['rotate']
             start_angle = c['start_angle']
@@ -527,7 +531,11 @@ if __name__ == "__main__":
     parser.add_argument("-m", help="full screen start", action='store_true', required=False)
     args = parser.parse_args()
     if args.m :
-        maximizeStart = True
+        if os.uname()[4] == 'armv7l': #For Raspberry 4B
+            fullscreenStart = True
+        elif os.uname()[4] == 'aarch64': #For Jetson Nano
+            maximizeStart = True
+
     
     #Start camera and read avalaible captures
     camWrap = camWrap() 

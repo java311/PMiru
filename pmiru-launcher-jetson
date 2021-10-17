@@ -1,0 +1,13 @@
+#!/bin/bash
+#Launcher for PMIRU. 
+export KIVY_NO_ARGS=1
+
+cd /
+cd $HOME/PMiru
+lxterminal -e "python3 pmiru.py; bash" 
+
+#if no arguments start minimized
+#if [ -z "$*" ]; then python pmiru.py; fi
+
+#if -m start maximized
+#if [ $1 == "-m" ]; then python pmiru.py -m; fi

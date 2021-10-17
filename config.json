@@ -3,6 +3,7 @@
   {
    "wheel": false,
    "maximized": false,
+   "fullscreen": false,
    "stacks": false,
    "rotate": true,
    "start_angle": 46,
