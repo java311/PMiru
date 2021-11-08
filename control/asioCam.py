@@ -31,7 +31,11 @@ class asioCam():
 
 
         #object to que the frames
-        self.deque = deque(maxlen=deque_size)
+        # self.deque = deque(maxlen=deque_size)
+        self.deque = []
+        self.deque_indx = -1
+        self.MAX_LEN = deque_size
+        self.first = True
 
         self.get_frame_thread = Thread(target=self.get_frame, args=())
         self.get_frame_thread.daemon = True
@@ -244,17 +248,20 @@ class asioCam():
     # Stops the thread 
     def stopCaptureLoop(self):
         self.stop = True
-        self.deque.clear()
+        # self.deque.clear()
+        self.deque_indx = 0
 
     # Only clear the frame queue
     def clearQueue(self):
-        self.deque.clear()
+        # self.deque.clear()
+        self.deque_indx = 0
 
     # Main camera capture thread
     def get_frame(self):
         whbi = self.camera.get_roi_format()
         shape = [whbi[1],whbi[0]]
         while (True):
+            now = round(time.time() * 1000)
             if self.stop == False:
                 raw = self.camera.get_video_data(timeout=self.timeout)
                 if self.imgType == 8 or self.imgType == 12:
@@ -267,7 +274,18 @@ class asioCam():
 
                 # cv2.imshow("show", show)  #OPENCV DEBUG
                 # cv2.waitKey(1)            #OPENCV DEBUG
-                self.deque.append(rawImg)
+                # self.deque.append(rawImg)
+                if self.first:
+                    self.deque.append(rawImg)
+                else:
+                    self.deque[self.deque_indx] = rawImg
+
+                self.deque_indx = self.deque_indx + 1
+                if self.deque_indx >= self.MAX_LEN:
+                    self.deque_indx = 0
+                    self.first = False
+            time_len = round(time.time() * 1000) - now
+            # print(time_len)
 
 
     # Gets current image type of the camera
@@ -281,14 +299,16 @@ class asioCam():
     # Gets a single frame from the queue
     def get_video_frame(self):
         if len(self.deque) > 0 and self.stop == False:
-            return self.deque[-1]
+            # return self.deque[-1
+            return self.deque[self.deque_indx]
         else:
             return None
 
      # Gets the mdian of the frame and drop it
     def get_median_frame(self):
         if len(self.deque) > 0 and self.stop == False:
-            frame = self.deque[-1]
+            # frame = self.deque[-1]
+            frame = self.deque[self.deque_indx]
             median = np.median(frame)
             return median
         else:
@@ -347,19 +367,36 @@ class asioCam():
 
     # Saves the control values of the camera in a txt file
     def saveControlValues(self, path, filename):
+        data = {}
+        data['camera'] = []
         settings = self.camera.get_control_values()
+        data['camera'].append( { str(k) : str(settings[k]) for k in sorted(settings.keys())   } )
+    
+        data['lights'] = []
+        data['angles'] = []
+        # data['motor_angles'] = []
+        # data['file_angles'] = []
+        # data['real_angles'] =[]
+        data['colors'] = []
+        with open('config.json') as cfile:
+            start = 0; stop =0; step =0
+            cfg = json.load(cfile)
+            for c in cfg['config']:
+                start = c['start_angle']
+                stop = c["stop_angle"]
+                step = c["step_angle"] 
+            
+            data['angles'].append ({ "start" : start, 'stop': stop, 'step': step })  
+            data['colors'].append([ c['wavelenght'] for c in cfg['lights']  ] )
+            # data['motor_angles'].append([ r for i,r in enumerate(range ( start , stop , step ))  ] )  
+            # data['file_angles'].append([ r for i,r in enumerate(range (90, 90 + (stop-start), step  )) ]  ) 
+            # data['real_angles'].append( [r for i,r in enumerate(range(0, stop-start, step )) ] )  
 
-        fullpath = path + os.path.sep + filename
+            data['lights'] = cfg['lights']
+             
+
+        fullpath = os.path.join(path, filename)
         with open(fullpath, 'w') as f:
-            for k in sorted(settings.keys()):
-                f.write('%s: %s\n' % (k, str(settings[k])))
+            json.dump(data, f, indent=1)
 
-            #Save JSON exposure and gain values too
-            with open('config.json') as cfile:
-                cfg = json.load(cfile)
-                for c in cfg['lights']:
-                    f.write('WaveLenght: %s nm\n' % (str(c['wavelenght'])))
-                    f.write('Exposure: %s \n' % (str(c['zwo-exp'])))
-                    f.write('Gain: %s ms\n' % (str(c['zwo-gain'])))
-
-        print('Camera settings saved to %s' % fullpath)
+        print('Camera, motor and color settings saved to %s' % fullpath)

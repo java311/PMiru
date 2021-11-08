@@ -24,6 +24,9 @@ Then install OpenCV using pip.
 
 `pip3 install opencv-python`
 
+It is necessary to install contrib version for superpixel support
+`pip3 install opencv-contrib-python`
+
 Be patient this step takes a lot of time
 
 Then install the OpenCV dependencies 
@@ -36,6 +39,9 @@ sudo apt-get install libjasper-dev
 sudo apt-get install libqtgui4 
 sudo apt-get install libqt4-test
 ```
+
+Also it is necessary to install polanalyser for the superpixel segmentation:
+`pip install git+https://github.com/elerac/polanalyser`
 
 ## Kivy
 The best is to install it from apt

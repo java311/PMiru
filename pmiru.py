@@ -54,10 +54,74 @@ if enableWheel:
 from control.camWrap import camWrap              #class to wrap ZWO and Baumer API cameras
 from control.ledControl import ledControl
 from control.motorControl import Motor
+from analysis.segmentation import Segmentation
+
+# Function to hide/show kivy widgets
+def hide_widget(wid, dohide=True):
+    if hasattr(wid, 'saved_attrs'):
+        if not dohide:
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
+            del wid.saved_attrs
+    elif dohide:
+        wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
+        wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
 
 class FirstScreen(Screen):
     def __init__(self, **kwargs):
         super(FirstScreen, self).__init__(**kwargs)
+
+class SegmentationScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SegmentationScreen, self).__init__(**kwargs)
+        self.path = ""
+        self.imgPath = ""
+        self.seg = None
+
+    def setSegImage(self, path, imgPath):
+        self.path = path; self.imgPath = imgPath 
+        self.ids.seg_img.source = imgPath  #show normal image before seg alg. finish
+        self.run_segmentation()  # runs segmentation algorithm
+
+    def run_segmentation(self):
+        print (self.path)
+        print (self.imgPath)
+        hide_widget(self.ids.seg_upload, True)
+        self.seg = Segmentation(self.path, self.imgPath) # init segmentation object
+        self.seg.runSuperPixels()  # rung algorithm
+        
+        self.updateImgFromMem(self.seg.result, gray=True)  # show result on screen
+
+    # Updates kivy widget using OpenCV on memory image
+    def updateImgFromMem(self, img, gray=True):
+        if gray:
+            texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='luminance', bufferfmt='ubyte') 
+            texture.blit_buffer(img.tostring(),colorfmt='luminance', bufferfmt='ubyte')  
+            texture.flip_vertical()    # 画像を上下反転する
+
+            self.ids.seg_img.texture = texture
+        else:
+            texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='bgr', bufferfmt='ubyte') 
+            texture.blit_buffer(img.tostring(),colorfmt='bgr', bufferfmt='ubyte')  
+            texture.flip_vertical()    # 画像を上下反転する
+
+            self.ids.seg_img.texture = texture
+        # with widget.canvas:
+            # Rectangle(texture=texture ,pos=(0, 0), size=(img.shape[1], img.shape[0]))
+
+    def on_touch_up(self, touch):
+        px = int(self.seg.dim_x * touch.spos[0])
+        py = self.seg.dim_y - int(self.seg.dim_y * touch.spos[1])  #y axis is reversed
+        img = self.seg.upadteSelImage(px, py)
+
+        self.updateImgFromMem(img, gray=False)
+        hide_widget(self.ids.seg_upload, not self.seg.done)
+
+
+    def upload_cube(self):
+        self.seg.saveMask()
+        # TODO Uplaod hypercube to Google Drive
+        #self.seg.uploadCube()
+
 
 class CameraScreen(Screen):
 
@@ -150,16 +214,6 @@ class CameraScreen(Screen):
             json.dump(json_cfg, cfile, indent=1)
         print ("Start angle saved in JSON file...")
 
-    def hide_progress_bar(self, dohide=True):
-        wid = self.ids.prog_bar
-        if hasattr(wid, 'saved_attrs'):
-            if not dohide:
-                wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
-                del wid.saved_attrs
-        elif dohide:
-            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
-            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
-
 ############  VIEWER GUI CONTROL CLASS ####################
 class ViewerScreen(Screen):
         
@@ -220,6 +274,16 @@ class ViewerScreen(Screen):
         if layerIndex < 0:
             layerIndex = len(cubeFiles[cubeIndex]) -1
         self.imageChange(cubeIndex, layerIndex)
+
+    def goto_segmentation(self):
+        global layerIndex
+        global cubeIndex
+
+        imgPath = cubeFiles[cubeIndex][layerIndex]
+        path = os.path.dirname(imgPath)
+        sm.get_screen('segmentation').setSegImage(path, imgPath)
+        self.manager.current = 'segmentation'
+
 
 class ConfigScreen(Screen):
 
@@ -352,6 +416,7 @@ class PmiruApp(App):
         sm.add_widget(CameraScreen(name='camera'))
         sm.add_widget(ConfigScreen(name='config'))
         sm.add_widget(ViewerScreen(name='viewer'))
+        sm.add_widget(SegmentationScreen(name='segmentation'))
         
         Window.size = (wSizeX, wSizeY)
         Window.bind(on_resize=self.check_resize)
@@ -365,7 +430,8 @@ class PmiruApp(App):
     def on_start(self, **kwargs):
         if sm.current == 'camera':
             Clock.schedule_interval(sm.get_screen("camera").cameraRefreshCallback, 0.01)
-        sm.get_screen("camera").hide_progress_bar(True)
+        # sm.get_screen("camera").hide_progress_bar(True)
+        hide_widget(sm.get_screen("camera").ids.prog_bar, True)
 
         sm.get_screen("camera").ids.angle_txt.text = str(motor.start_angle) + "°"
 
@@ -462,7 +528,8 @@ def takeHyperCube():
     nAngles = motor.getNumAngles()
     nlayers = leds.nColors * nAngles 
     motor.movetoInit()  #moves motor to the first angle of the list
-    sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
+    # sm.get_screen("camera").hide_progress_bar(False)  #show progress bar
+    hide_widget(sm.get_screen("camera").ids.prog_bar, False)
     sm.get_screen("camera").ids.prog_bar.value = 0
     sm.get_screen("camera").ids.shoot_btn.disabled = True
     for angle in range(0,nAngles): # For each angle
@@ -503,11 +570,12 @@ def takeHyperCube():
     if stackedTiffs == True:
         camWrap.buildTiffStacks(folder, leds, sm.get_screen("camera").ids.prog_bar, exit_event)  #Stacked tiffs by led color 
 
-    camWrap.saveControlValues(path=folder, filename="controlValues.txt")
+    camWrap.saveControlValues(path=folder, filename="controlValues.json")
     camWrap.captureLoop(True)
     sm.get_screen("camera").ids.shoot_btn.disabled = False  #enable shoot button again
     sm.get_screen("camera").refreshByFile = False  #go back to normal camera refresh
-    sm.get_screen("camera").hide_progress_bar(True) #hide progress bar
+    # sm.get_screen("camera").hide_progress_bar(True) #hide progress bar
+    hide_widget(sm.get_screen("camera").ids.prog_bar, True)
 
 
 if __name__ == "__main__":

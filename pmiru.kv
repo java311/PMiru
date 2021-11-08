@@ -70,8 +70,6 @@
             pos_hint: {"right": 0.85, 'top':0.25}
             
 
-
-
 <ViewerScreen>:
     FloatLayout:
         Image:
@@ -130,7 +128,14 @@
             size_hint: 0.1, 0.1
             bold: True
             font_size: '25sp'
-            pos_hint: {"x":0.2, 'top':0.1}
+            pos_hint: {"x":0.2, 'top':1}
+        ActionButton:
+            text: 'Cube Analysis'
+            icon: 'camera_right.png'
+            size_hint: 0.15, 0.15
+            pos_hint: {"right":0.1, 'top':0.15}
+            # on_release: root.manager.current = 'segmentation'
+            on_release: root.goto_segmentation()
         
 
 <ConfigScreen>:
@@ -287,3 +292,30 @@
                 icon: 'right_red.png'
                 size_hint: 0.7, 0.7
             #    on_release: root.screen_change('motor_config')
+
+<SegmentationScreen>:
+    FloatLayout:
+        Image:
+            id: seg_img
+            size: root.size
+            on_touch_up: root.on_touch_up()
+        ActionButton:
+            text: 'Back to Viewer'
+            icon: 'flower_red.png'
+            size_hint: 0.15, 0.15
+            pos_hint: {"right":1, 'top':0.15}
+            on_release: root.manager.current = 'viewer'
+        ActionButton:
+            text: 'Cube Vol. Viewer'
+            icon: 'camera_right.png'
+            size_hint: 0.15, 0.15
+            pos_hint: {"right":0.1, 'top':0.15}
+            on_release: root.volume_view_launch()
+        ActionButton:
+            text: 'Upload cube'
+            id: seg_upload
+            icon: 'camera_right.png'
+            size_hint: 0.15, 0.15
+            pos_hint: {"x": 0.40, 'down':0.5}
+            on_release: root.upload_cube()
+        
