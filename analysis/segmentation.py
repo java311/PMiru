@@ -13,7 +13,8 @@ class Segmentation:
     def __init__(self, path, imgPath):
         self.path = path
         self.imgPath = imgPath
-        self.result = None
+        self.last = None
+        self.original = None
         self.labels = None
         self.lab_mask = None
         self.dim_x = 0
@@ -52,7 +53,7 @@ class Segmentation:
         mask_inv = cv.bitwise_not(mask)
         result_bg = cv.bitwise_and(img, img, mask=mask_inv)
         result_fg = cv.bitwise_and(white_img, white_img, mask=mask)
-        self.result = cv.add(result_bg, result_fg)
+        self.original = cv.add(result_bg, result_fg)
 
         # calculate the mean values inside each super pixel area
         self.labels = slic.getLabels()
@@ -63,9 +64,13 @@ class Segmentation:
         self.dim_y = img.shape[0]
         self.selected = [False] * self.n_spx 
 
+        # change result to bgr for showing it on the screen 
+        self.original = cv.cvtColor(self.original, cv.COLOR_GRAY2BGR )
+        return self.original
+
     # Updates the selection mask with the new superpixels selected by the user. 
     # px and py are the pixel regions where the user clicked
-    def upadteSelImage(self, px, py):
+    def updateSelImage(self, px, py):
         # self.result = cv.circle(self.result, (px,py), radius=5, color=(0,0,255), thickness =3 ) # DEBUG
         sp_index = self.labels[py][px]
         self.selected[sp_index] = not self.selected[sp_index]
@@ -83,10 +88,10 @@ class Segmentation:
         redImg = np.full( (d[0], d[1], 3), 255, self.lab_mask.dtype)
         redImg[:,:] = (0, 0, 255)
         redMask = cv2.bitwise_and(redImg, redImg, mask=self.lab_mask)
-        pinchi = cv2.merge((self.result,self.result,self.result))
-        pinchi = cv2.addWeighted(redMask, 0.1, pinchi, 0.9, 0)
+        # self.result_col = cv2.merge((self.result,self.result,self.result))
+        self.last  = cv2.addWeighted(redMask , 0.1, self.original, 0.9, 0)
 
-        return pinchi
+        return self.last
 
     # This function save the mask selected with the super pixels
     def saveMask(self):

@@ -83,39 +83,35 @@ class SegmentationScreen(Screen):
         self.run_segmentation()  # runs segmentation algorithm
 
     def run_segmentation(self):
-        print (self.path)
-        print (self.imgPath)
         hide_widget(self.ids.seg_upload, True)
         self.seg = Segmentation(self.path, self.imgPath) # init segmentation object
-        self.seg.runSuperPixels()  # rung algorithm
+        img = self.seg.runSuperPixels()  # rung algorithm
         
-        self.updateImgFromMem(self.seg.result, gray=True)  # show result on screen
+        self.updateImgFromMem(img)  # show result on screen
+
+    def resize_event(self):
+        self.updateImgFromMem(self.seg.last)
 
     # Updates kivy widget using OpenCV on memory image
-    def updateImgFromMem(self, img, gray=True):
-        if gray:
-            texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='luminance', bufferfmt='ubyte') 
-            texture.blit_buffer(img.tostring(),colorfmt='luminance', bufferfmt='ubyte')  
-            texture.flip_vertical()    # 画像を上下反転する
+    def updateImgFromMem(self, img):
+        img = cv2.resize(img,(wSizeX,wSizeY) )
+        texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='bgr', bufferfmt='ubyte') 
+        texture.blit_buffer(img.tostring(),colorfmt='bgr', bufferfmt='ubyte')  
+        texture.flip_vertical()    
 
-            self.ids.seg_img.texture = texture
-        else:
-            texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='bgr', bufferfmt='ubyte') 
-            texture.blit_buffer(img.tostring(),colorfmt='bgr', bufferfmt='ubyte')  
-            texture.flip_vertical()    # 画像を上下反転する
+        self.ids.seg_img.texture = texture
 
-            self.ids.seg_img.texture = texture
-        # with widget.canvas:
-            # Rectangle(texture=texture ,pos=(0, 0), size=(img.shape[1], img.shape[0]))
-
+    # on image touch up event
     def on_touch_up(self, touch):
+        # if touch inside upload buttton then do nothing
+        if touch.spos[1] < 0.15 and  (touch.spos[0] < 0.55 and touch.spos[0]> 0.40):
+            return 
+
         px = int(self.seg.dim_x * touch.spos[0])
-        py = self.seg.dim_y - int(self.seg.dim_y * touch.spos[1])  #y axis is reversed
-        img = self.seg.upadteSelImage(px, py)
-
-        self.updateImgFromMem(img, gray=False)
+        py = self.seg.dim_y - int(self.seg.dim_y * touch.spos[1])  #y axis is reverse
+        img = self.seg.updateSelImage(px, py)
+        self.updateImgFromMem(img)
         hide_widget(self.ids.seg_upload, not self.seg.done)
-
 
     def upload_cube(self):
         self.seg.saveMask()
@@ -444,6 +440,9 @@ class PmiruApp(App):
         global wSizeX, wSizeY
         wSizeX = Window.size[0]
         wSizeY = Window.size[1]
+
+        if sm.current == 'segmentation':
+            sm.get_screen("segmentation").resize_event()
 
 # Kills threads and Turn OFF lights before exit
 def before_destroy():

@@ -19,7 +19,7 @@
         ActionButton:
             icon: "flower_red.png"
             size_hint: 0.15, 0.15
-            pos_hint: {"right": 0.15, 'top':1}
+            pos_hint: {"x": 0, 'down':0.9}
             on_release: root.screen_change('viewer')
         ActionButton:
             icon: 'led_red.png'
@@ -29,7 +29,7 @@
         ActionButton:
             icon: 'exit_red.png'
             size_hint: 0.13, 0.13
-            pos_hint: {"x": 0, 'down':0.9}
+            pos_hint: {"right": 0.15, 'top':1}
             on_release: root.exit_press()
         ActionButton:
             icon: 'up_red.png'
@@ -130,10 +130,10 @@
             font_size: '25sp'
             pos_hint: {"x":0.2, 'top':1}
         ActionButton:
-            text: 'Cube Analysis'
-            icon: 'camera_right.png'
+            text: 'Segmentation and Upload'
+            icon: 'cut_red.png'
             size_hint: 0.15, 0.15
-            pos_hint: {"right":0.1, 'top':0.15}
+            pos_hint: {"right":0.15, 'top':0.15}
             # on_release: root.manager.current = 'segmentation'
             on_release: root.goto_segmentation()
         
@@ -297,7 +297,11 @@
     FloatLayout:
         Image:
             id: seg_img
+            pos: self.pos
+            size_hint: None, None
             size: root.size
+            allow_strech: True
+            keep_ratio: False
             on_touch_up: root.on_touch_up()
         ActionButton:
             text: 'Back to Viewer'
@@ -306,15 +310,9 @@
             pos_hint: {"right":1, 'top':0.15}
             on_release: root.manager.current = 'viewer'
         ActionButton:
-            text: 'Cube Vol. Viewer'
-            icon: 'camera_right.png'
-            size_hint: 0.15, 0.15
-            pos_hint: {"right":0.1, 'top':0.15}
-            on_release: root.volume_view_launch()
-        ActionButton:
             text: 'Upload cube'
             id: seg_upload
-            icon: 'camera_right.png'
+            icon: 'upload_red.png'
             size_hint: 0.15, 0.15
             pos_hint: {"x": 0.40, 'down':0.5}
             on_release: root.upload_cube()

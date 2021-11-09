@@ -274,7 +274,8 @@ class camWrap():
             ff = []
             for item in self.listdir_fullpath(self.rootPath + os.path.sep + folder + os.path.sep):
                 if os.path.isfile(item) and item.endswith('.tiff') and os.path.getsize(item) < 30000000 : #Only TIFF file < 50 Mb will be listed
-                    ff.append(item)
+                    if os.path.splitext(os.path.basename(item))[0] != 'mask':  # Do not add selection mask to the list
+                        ff.append(item)
 
             ff.sort(key=lambda x: os.path.getmtime(x), reverse=True)  #sort files by creation date
             flist.append(ff)
