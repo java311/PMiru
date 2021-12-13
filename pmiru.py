@@ -24,6 +24,7 @@ sm = None #Kivy ScreenManager
 cubeThread = None # thread object to run capture process
 calibThread = None # thread object to run the calibration capture 
 exit_event = threading.Event()  # Event to kill capture and calib threads
+uploader = None # Class to auth and upload the photos to google drive
 
 # PROGRAM CONTROL FLAGS
 # These flags are populated with config.json file
@@ -55,6 +56,7 @@ from control.camWrap import camWrap              #class to wrap ZWO and Baumer A
 from control.ledControl import ledControl
 from control.motorControl import Motor
 from analysis.segmentation import Segmentation
+from upload.g_upload import GUpload
 
 # Function to hide/show kivy widgets
 def hide_widget(wid, dohide=True):
@@ -114,9 +116,10 @@ class SegmentationScreen(Screen):
         hide_widget(self.ids.seg_upload, not self.seg.done)
 
     def upload_cube(self):
+        # save the mask 
         self.seg.saveMask()
-        # TODO Uplaod hypercube to Google Drive
-        #self.seg.uploadCube()
+        # upload Google Drive
+        uploader.upload_folder(self.seg.path)
 
 
 class CameraScreen(Screen):
@@ -619,6 +622,9 @@ if __name__ == "__main__":
     #calib from -144 to 144 value
     motor.initCalibAngles(step_calib)
     motor.movetoInit()
+
+    #Initialize the uploader
+    uploader = GUpload()
     
     #In case you want to use the filter wheel
     # if enableWheel:
