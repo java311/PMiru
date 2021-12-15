@@ -80,8 +80,10 @@ class ledControl():
     def getColorExpGain(self, camType, index):  
         if camType == 'zwo':  # for zwo
             return [self.zwo_exp[index], self.zwo_gain[index]]
-        else: # for baumer
+        elif camType == 'baumer': # for baumer
             return [self.baumer_exp[index], self.baumer_gain[index]]
+        else:
+            return [self.zwo_exp[index], self.zwo_gain[index]]
 
     # Turn all LEDs OFF (called on closing)
     def lightsOff(self, wait=1):

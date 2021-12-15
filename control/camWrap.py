@@ -11,6 +11,7 @@ from PIL import Image, ImageOps
 # Program imports
 from control.asioCam import asioCam              #class to control the ZWO camera
 from control.baumerCam import baumerCam          #class to control the Baumer camera
+from control.elpCam import elpCam                #class to contorl the ELP cameras
 
 class camWrap():
 
@@ -50,11 +51,17 @@ class camWrap():
                 sys.exit()
 
             self.setRootPath()
-        else:
+        elif self.camType == 'baumer':
             self.cam = baumerCam()
             self.cam.initCam(imgType=8)
 
             self.setRootPath()
+        elif self.camType == 'elp':
+            self.cam = elpCam()
+            self.cam.initCam()
+
+            self.setRootPath()
+        
 
     # TODO this only works for Linux
     def checkCamType(self):
@@ -94,8 +101,16 @@ class camWrap():
             print ("Baumer camera found.")
             return ['baumer',False]  #baumer found
 
+        #check if ELP monochrome camera is present
+        out = subprocess.Popen(['lsusb', '-d', '32e4:0144'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        stdout, stderr = out.communicate()
+        
+        stdout = stdout.decode('utf-8')
+        if stderr == None and stdout.find('32e4:0144') != -1:
+            print ("ELP camera found.")
+            return ['elp',False]  #elp camera found
 
-        print ("ERROR: No Baumer or ZWO cameras found")
+        print ("ERROR: No Baumer, ZWO or ELP cameras were found.")
         sys.exit()
 
     def get_video_frame(self):

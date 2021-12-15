@@ -455,7 +455,7 @@ def before_destroy():
         leds.lightsOff()
         motor.motorOff()
 
-# NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACEN INFRONT A WHITE SCREEN OR SURFACE
+# NOTE FOR THIS FUNCTION TO WORK THE CAMERA HAS TO BE PLACE INFRONT A WHITE SCREEN OR SURFACE
 # Gain/Exposore calibration for each LED of the camera by
 # taking calculating the median illumination value of a white surface
 def runLightCalibration():

@@ -2,7 +2,6 @@ import cv2 as cv
 import cv2.ximgproc
 import numpy as np
 import os
-import polanalyser as pa 
 
 
 # This class implements a simple manual segmentation algorithm
