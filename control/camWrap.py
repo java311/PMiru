@@ -227,6 +227,8 @@ class camWrap():
     def saveControlValues(self, path, filename):
         if self.camType == 'zwo':
             self.cam.saveControlValues(path=path, filename=filename)
+        elif self.camType == 'elp':
+            self.cam.saveControlValues(path=path, filename=filename)
         else:
             pass  #TODO implement this function for Baumer
 

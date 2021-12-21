@@ -7,6 +7,7 @@
 import cv2
 import os
 import time
+import json
 import subprocess
 import numpy as np
 from threading import Thread
@@ -181,8 +182,8 @@ class elpCam():
         ret, img = self.camera.read()
         # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # THIS MAYBE IS SLOW
         median = np.median(img)
-        cv2.imshow("debugo", img)  #OPENCV DEBUG
-        cv2.waitKey(1)             #OPENCV DEBUG
+        # cv2.imshow("debugo", img)  #OPENCV DEBUG
+        # cv2.waitKey(1)             #OPENCV DEBUG
         return median
 
     # ELP method to calibration is totally different from baumer and zwo 
@@ -196,7 +197,6 @@ class elpCam():
         time.sleep(wait)  # wait for the image to stabilize 
         auto_exp_median = self.getMedianRawShoot(drops) # get the auto exposure median value
 
-        print ("auto_median: " + str(auto_exp_median))
         # Get the exposure value by increasing the exposure and getting the median 
         median = 0
         exp_steps = 200
@@ -224,4 +224,36 @@ class elpCam():
         self.median = auto_exp_median 
 
         return [self.exposure, self.gain, self.median]
+
+    # Saves the control values of the camera in a txt file
+    def saveControlValues(self, path, filename):
+        data = {}
+        # data['camera'] = []
+        # settings = self.camera.get_control_values()
+        # data['camera'].append( { str(k) : str(settings[k]) for k in sorted(settings.keys())   } )
+    
+        data['lights'] = []
+        data['angles'] = []
+        data['colors'] = []
+        with open('config.json') as cfile:
+            start = 0; stop =0; step =0
+            cfg = json.load(cfile)
+            for c in cfg['config']:
+                start = c['start_angle']
+                stop = c["stop_angle"]
+                step = c["step_angle"] 
+            
+            data['angles'].append ({ "start" : start, 'stop': stop, 'step': step })  
+            data['colors'].append([ c['wavelenght'] for c in cfg['lights']  ] )
+            # data['motor_angles'].append([ r for i,r in enumerate(range ( start , stop , step ))  ] )  
+            # data['file_angles'].append([ r for i,r in enumerate(range (90, 90 + (stop-start), step  )) ]  ) 
+            # data['real_angles'].append( [r for i,r in enumerate(range(0, stop-start, step )) ] )  
+            data['lights'] = cfg['lights']
+             
+
+        fullpath = os.path.join(path, filename)
+        with open(fullpath, 'w') as f:
+            json.dump(data, f, indent=1)
+
+        print('Camera, motor and color settings saved to %s' % fullpath)
 

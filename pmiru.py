@@ -121,7 +121,7 @@ class SegmentationScreen(Screen):
         self.seg.saveMask()
         # upload Google Drive
         hide_widget(self.ids.seg_prog_bar, False)
-        uploader.start_upload_thread(self.seg.path, self.ids.seg_prog_bar )
+        uploader.start_upload_thread(self.seg.path, self.ids.seg_prog_bar, exit_event )
 
 
 class CameraScreen(Screen):

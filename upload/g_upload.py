@@ -50,11 +50,11 @@ class GUpload:
 
         return build('drive', 'v3', credentials=creds)
 
-    def start_upload_thread(self, fullpath, prog_bar ):
-        self.upload_thread = Thread(target=self.upload_folder, args=(fullpath, prog_bar))
+    def start_upload_thread(self, fullpath, prog_bar, exit_event):
+        self.upload_thread = Thread(target=self.upload_folder, args=(fullpath, prog_bar, exit_event))
         self.upload_thread.start()
 
-    def upload_folder(self, fullpath, prog_bar):
+    def upload_folder(self, fullpath, prog_bar, exit_event):
         folder_name = os.path.basename(os.path.normpath(fullpath))
         prog_bar.value = 0
 
@@ -83,6 +83,11 @@ class GUpload:
         # Upload all the files in the given path 
         n = len(path_files)
         for i, f in enumerate(path_files):
+            # check if the user exit the program to kill the thread
+            if exit_event.is_set():
+                print ("Upload thread killed...")
+                return
+
             # first, define file metadata, such as the name and the parent folder ID
             file_metadata = {
                 "name": str(f),
@@ -92,8 +97,8 @@ class GUpload:
             media = MediaFileUpload(os.path.join(fullpath, f), resumable=True)
             file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
             prog_bar.value = int(((i +1)* 100) / n)
-            # print("File created, id:", file.get("id"))  # DEBUG
-            # print("Progress: " + str(prog_bar.value) )   # DEBUG
+            print("File created, id:", file.get("id"))  # DEBUG
+            print("Progress: " + str(prog_bar.value) )   # DEBUG
         
         hide_widget(prog_bar, True)
 
