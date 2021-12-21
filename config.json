@@ -19,8 +19,10 @@
    "wavelenght": 590,
    "zwo-exp": 0.055777,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 4801.0,
+   "elp-gain": 121.0
   },
   {
    "channel": 1,
@@ -28,8 +30,10 @@
    "wavelenght": 400,
    "zwo-exp": 0.08007,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 8201.0,
+   "elp-gain": 206.0
   },
   {
    "channel": 2,
@@ -37,8 +41,10 @@
    "wavelenght": 8000,
    "zwo-exp": 0.052159,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 3601.0,
+   "elp-gain": 91.0
   },
   {
    "channel": 3,
@@ -46,8 +52,10 @@
    "wavelenght": 620,
    "zwo-exp": 0.035058,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 5201.0,
+   "elp-gain": 131.0
   },
   {
    "channel": 4,
@@ -55,8 +63,10 @@
    "wavelenght": 520,
    "zwo-exp": 0.052166,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 5201.0,
+   "elp-gain": 131.0
   },
   {
    "channel": 5,
@@ -64,8 +74,10 @@
    "wavelenght": 460,
    "zwo-exp": 0.070785,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 8201.0,
+   "elp-gain": 206.0
   },
   {
    "channel": 6,
@@ -73,8 +85,10 @@
    "wavelenght": 390,
    "zwo-exp": 0.070785,
    "zwo-gain": 50.0,
-   "baumer-exp": 1000.0,
-   "baumer-gain": 9.98828125
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 1.0,
+   "elp-gain": 1.0
   },
   {
    "channel": 7,
@@ -82,8 +96,10 @@
    "wavelenght": 660,
    "zwo-exp": 0.034668,
    "zwo-gain": 49.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 5201.0,
+   "elp-gain": 131.0
   },
   {
    "channel": 0,
@@ -91,8 +107,10 @@
    "wavelenght": 740,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 2801.0,
+   "elp-gain": 71.0
   },
   {
    "channel": 1,
@@ -100,8 +118,10 @@
    "wavelenght": 850,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 2801.0,
+   "elp-gain": 71.0
   },
   {
    "channel": 2,
@@ -109,8 +129,10 @@
    "wavelenght": 940,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
-   "baumer-exp": 93.875,
-   "baumer-gain": 1.0
+   "baumer-exp": 9.3e-05,
+   "baumer-gain": 32.0,
+   "elp-exp": 2801.0,
+   "elp-gain": 71.0
   }
  ]
 }

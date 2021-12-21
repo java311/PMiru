@@ -39,8 +39,9 @@ class camWrap():
             lib_path = "/lib/arm-linux-gnueabihf/libASICamera2.so"  #DEFAULT OS raspbian
             if platform == 'win32':
                 lib_path = "C:\\pmiru\\software\\zwo\\ASI SDK\\lib\\x64\\ASICamera2.dll"
-            elif os.uname()[4] == 'armv7l':  # for raspberry b4
-                lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.16.3/lib/armv7/libASICamera2.so"
+            elif os.uname()[4] == 'armv7l':  # for raspberry B4
+                # lib_path = "/home/pi/Downloads/ASI_linux_mac_SDK_V1.20.3/lib/armv7/libASICamera2.so" # NEW LIBS TEST (DEBUG)
+                lib_path = "/lib/arm-linux-gnueabihf/libASICamera2.so"
             elif os.uname()[4] == 'aarch64':  # jetson 
                 lib_path = "/usr/lib/aarch64-linux-gnu/libASICamera2.so"
             

@@ -86,6 +86,7 @@ class SegmentationScreen(Screen):
 
     def run_segmentation(self):
         hide_widget(self.ids.seg_upload, True)
+        hide_widget(self.ids.seg_prog_bar, True)
         self.seg = Segmentation(self.path, self.imgPath) # init segmentation object
         img = self.seg.runSuperPixels()  # rung algorithm
         
@@ -119,7 +120,8 @@ class SegmentationScreen(Screen):
         # save the mask 
         self.seg.saveMask()
         # upload Google Drive
-        uploader.upload_folder(self.seg.path)
+        hide_widget(self.ids.seg_prog_bar, False)
+        uploader.start_upload_thread(self.seg.path, self.ids.seg_prog_bar )
 
 
 class CameraScreen(Screen):
@@ -478,8 +480,11 @@ def runLightCalibration():
 
         leds.colorOnOff(color, True)  # Turn on each LED
         
-        egm = camWrap.auto_exp_gain_calib(with_median=True, wait=0.500, drops=5, good_frames=3) #calibrate with median, return exp,gain,median
-        autoExpVals.append(egm[0]/1000000)   # save exposure in ms
+        egm = camWrap.auto_exp_gain_calib(with_median=True, wait=4, drops=5, good_frames=3) #calibrate with median, return exp,gain,median
+        if camWrap.camType == 'elp':
+            autoExpVals.append(egm[0]/1)         # save exposure directly in JSON file
+        else:
+            autoExpVals.append(egm[0]/1000000)   # save exposure in ms
         autoGainVals.append(egm[1]/1)   # gain %
         autoMedVals.append(egm[2])     # raw median value
 
@@ -497,9 +502,13 @@ def runLightCalibration():
         if camWrap.camType == 'zwo':
             json_cfg['lights'][color]['zwo-exp'] = autoExpVals[color]
             json_cfg['lights'][color]['zwo-gain'] = autoGainVals[color]
-        else:
+        elif camWrap.camType == 'baumer':  
             json_cfg['lights'][color]['baumer-exp'] = autoExpVals[color]
             json_cfg['lights'][color]['baumer-gain'] = autoGainVals[color]
+        else:
+            json_cfg['lights'][color]['elp-exp'] = autoExpVals[color]
+            json_cfg['lights'][color]['elp-gain'] = autoGainVals[color]
+
 
     with open('config.json', 'w') as cfile:   #save JSON
         print ("Dumpig JSON file...")
@@ -546,6 +555,8 @@ def takeHyperCube():
             exp_gain = leds.getColorExpGain(camType=camWrap.camType, index=color)
             camWrap.set_exposure(exp_gain[0])
             camWrap.set_gain(exp_gain[1])
+            print ("exp: " + str(exp_gain[0]))
+            print ("gain: " + str(exp_gain[1]))
             time.sleep(2) #Wait for the exposure to adjust (BUGFIX)
             fname = "img" + format(counter, '02d') + "_c" + str(leds.getWavelenght(color)) + "_a" + motor.getRealAngle(angle) + ".tiff"
             camWrap.takeSingleShoot(path=folder, filename=fname, drops=3, rot=rotateImages )

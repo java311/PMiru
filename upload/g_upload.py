@@ -1,6 +1,7 @@
 import pickle
 import os
 from os import walk
+from threading import Thread
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -10,9 +11,21 @@ from googleapiclient.http import MediaFileUpload
 SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly',
           'https://www.googleapis.com/auth/drive.file']
 
+
+# Function to hide/show kivy widgets
+def hide_widget(wid, dohide=True):
+    if hasattr(wid, 'saved_attrs'):
+        if not dohide:
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
+            del wid.saved_attrs
+    elif dohide:
+        wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
+        wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
+        
 class GUpload:
 
     def __init__(self):
+        self.upload_thread = None
         self.service = self.get_gdrive_service()
         
     def get_gdrive_service(self):
@@ -37,16 +50,20 @@ class GUpload:
 
         return build('drive', 'v3', credentials=creds)
 
+    def start_upload_thread(self, fullpath, prog_bar ):
+        self.upload_thread = Thread(target=self.upload_folder, args=(fullpath, prog_bar))
+        self.upload_thread.start()
 
-    def upload_folder(self, fullpath):
+    def upload_folder(self, fullpath, prog_bar):
         folder_name = os.path.basename(os.path.normpath(fullpath))
+        prog_bar.value = 0
 
         path_files = []
         for (dirpath, dirnames, filenames) in walk(fullpath):
             path_files.extend(filenames)
             break
 
-        print (path_files) # DEBUG
+        # print (path_files) # DEBUG
         """
         Creates a folder and upload a file to it
         """
@@ -64,6 +81,7 @@ class GUpload:
         print("Folder ID:", folder_id)
         
         # Upload all the files in the given path 
+        n = len(path_files)
         for i, f in enumerate(path_files):
             # first, define file metadata, such as the name and the parent folder ID
             file_metadata = {
@@ -73,7 +91,13 @@ class GUpload:
             # upload
             media = MediaFileUpload(os.path.join(fullpath, f), resumable=True)
             file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-            print("File created, id:", file.get("id"))
+            prog_bar.value = int(((i +1)* 100) / n)
+            # print("File created, id:", file.get("id"))  # DEBUG
+            # print("Progress: " + str(prog_bar.value) )   # DEBUG
+        
+        hide_widget(prog_bar, True)
+
+        
     
 
 

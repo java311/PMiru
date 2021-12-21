@@ -6,6 +6,7 @@
 # Python imports
 import cv2
 import os
+import time
 import subprocess
 import numpy as np
 from threading import Thread
@@ -68,6 +69,7 @@ class elpCam():
         stdout, stderr = out.communicate()
         
         stdout = stdout.decode('utf-8')
+        # print (stdout)   # DEBUG
         split_stdout = stdout.split(': ')
         return int(split_stdout[1])
 
@@ -77,15 +79,18 @@ class elpCam():
         stdout, stderr = out.communicate()
         
         stdout = stdout.decode('utf-8')
+        # print (stdout)   # DEBUG
         return stdout
     
     # sets the Exposure to the given value
     def setExposure(self, value):
+        # self.setValue('exposure_auto', 3)  # set manual exposure
         self.setValue('exposure_auto', 1)  # set manual exposure
-        self.setValue('exposure_absolute', value)   #set exposure value
+        self.setValue('exposure_absolute', int(value))   #set exposure value
 
     def setGain(self, value):
-        self.setValue('gain', value)  # set manual exposure
+        self.setValue('exposure_auto', 1)  # set manual exposure
+        self.setValue('gain', int(value))  # set manual exposure
 
     def set_min_exposure(self):
         self.setExposure(1)
@@ -145,11 +150,11 @@ class elpCam():
     #camera imgType is ignored here. Captures are taken with the given imgType
     def takeSingleShoot(self, path, filename, drops=3, rot=False):
         fullpath = path + os.path.sep + filename
-        print ("Taking frame...")
+        # print ("Taking frame...")
 
         # Drop several frames before taking the GOOD one
-        for i in range(drops):
-            print ("Dropping frame ... " + str(i))
+        for i in range(drops*10):
+            # print ("Dropping frame ... " + str(i))
             ret, img = self.camera.read()
 
         # this is the GOOD one
@@ -168,86 +173,55 @@ class elpCam():
                 buf = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY) # THIS MAYBE IS SLOW
                 self.deque.append(buf)
 
-
-    def getMedianRawShoot(self, drops, avgs):
-        print ("Taking raw Median frame...")
-        # Drop several frames before taking the GOOD one
+    def getMedianRawShoot(self, drops):
+        #Drop some frames first
         for i in range(drops):
             ret, img = self.camera.read()
 
-        if avgs <= 0:
-            return 0 
-
-        # this is the GOOD one
         ret, img = self.camera.read()
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # THIS MAYBE IS SLOW
-        median = 0
-        for i in range(avgs):
-            while np.sum(img) == 0:   # OPENCV DEBUG (check if it is not black)
-                print ('ERROR: black image')
-                ret, img = self.camera.read()
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # THIS MAYBE IS SLOW
-            median = median + np.median(img)
-            print ("median " + str(median))
-        median = median / avgs
-
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # THIS MAYBE IS SLOW
+        median = np.median(img)
+        cv2.imshow("debugo", img)  #OPENCV DEBUG
+        cv2.waitKey(1)             #OPENCV DEBUG
         return median
 
-
-    # ELP method to calibrate the settings for auto/gain exposure using LED lights 
+    # ELP method to calibration is totally different from baumer and zwo 
+    # because the auto exposure of the camera do not give us back the exposure value 
+    # Altough the camera is faster, so it faster to compare frame medians
     def autoExposureGainCalib(self, wait, drops, good_frames, min_median, max_median ):
-        # Turn On Auto exposure and gain
+        # set AutoExposure ON
         self.setAutoExposure(True)
-        # self.setAutoGain(True)
+        print ("calculating a new color") 
 
-        print('Waiting for auto-exposure to compute correct settings ...')
-        
-        sleep_interval = wait  #0.100 original value
-        df_last = 0
-        gain_last = 0
-        exposure_last = 0
-        m_threshold = 5
-        median_last = 0
-        # min_median = 15
-        # max_median = 200
-        matches = 0
-        while True:
-            time.sleep(sleep_interval)
-            # settings = self.camera.get_control_values()
-            # df = self.camera.get_dropped_frames()
-            self.getMedianRawShoot(drops,0)   #drop some frames before taking real values
+        time.sleep(wait)  # wait for the image to stabilize 
+        auto_exp_median = self.getMedianRawShoot(drops) # get the auto exposure median value
 
-            gain = self.get_gain()
-            exposure = self.get_exposure()
-            median = 0
-            
-            # Here was the drop frames IF
-            median = self.getMedianRawShoot(0,1)
-            print('   Gain {gain:f}  Exposure: {exposure:f} Median: {median:f} Dropped frames: {df:f}'
-            .format(gain=gain,
-                    exposure=exposure,
-                    median=median,
-                    df=df_last))
-            if abs(median - median_last) < m_threshold and median > min_median and median < max_median:
-                matches += 1
-            else:
-                matches = 0
-            if matches >= good_frames: 
-                break
+        print ("auto_median: " + str(auto_exp_median))
+        # Get the exposure value by increasing the exposure and getting the median 
+        median = 0
+        exp_steps = 200
+        exp = 1
+        gain_steps = 5
+        gain = 1
+        self.setAutoExposure(False)  # turning OFF auto exposure
+        self.setExposure(exp)
+        self.setValue('gain', gain)
+        for i in range(100):
+            ret, img = self.camera.read()
     
-            df_last = drops   #df_last = df
-            gain_last = gain
-            median_last = median
-            exposure_last = exposure
+        while ((median < auto_exp_median) and (exp < 8188)):
+            self.setExposure(exp)
+            self.setValue('gain', gain)
+            median = self.getMedianRawShoot(drops)
+            exp = exp + exp_steps
+            gain = gain + gain_steps
+            # print ("median: " + str(median))
+            # print ("exp: " + str(exp))
+            # print ("gain: " + str(gain))
 
-        self.gain = gain_last
-        self.exposure = exposure_last
-        self.autoExp = True
-        self.autoGain = True
-        self.median = median_last
+        self.exposure =  exp 
+        self.gain = gain
+        self.median = auto_exp_median 
 
         return [self.exposure, self.gain, self.median]
-            
-
-
 

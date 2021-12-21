@@ -316,4 +316,12 @@
             size_hint: 0.15, 0.15
             pos_hint: {"x": 0.40, 'down':0.5}
             on_release: root.upload_cube()
+
+        ProgressBar:
+            id: seg_prog_bar
+            min: 0 
+            max: 100
+            value: 0
+            size_hint: 0.7, 0.1
+            pos_hint: {"right": 0.85, 'top':0.25}
         

@@ -9,7 +9,7 @@ class ledControl():
     def __init__(self, ceNum=2, nboards=2, bus=1):
 
         ceNum=0; nboards=0; bus=0
-        if os.uname()[4] == 'armv7l':           #For Raspberry 4B
+        if os.uname()[4] == 'armv7l':       #For Raspberry 4B
             ceNum=2; nboards=2; bus=1
         elif os.uname()[4] == 'aarch64':   #For Jetson nano
             ceNum=0; nboards=2; bus=0
@@ -31,6 +31,8 @@ class ledControl():
         self.zwo_gain = []
         self.baumer_exp = []
         self.baumer_gain = []
+        self.elp_exp = []
+        self.elp_gain = []
         with open('config.json') as cfile:
             cfg = json.load(cfile)
             for c in cfg['lights']:
@@ -40,6 +42,8 @@ class ledControl():
                 self.zwo_gain.append( c['zwo-gain'] )
                 self.baumer_exp.append( c['baumer-exp'] )
                 self.baumer_gain.append( c['baumer-gain'] )
+                self.elp_exp.append( c['elp-exp'] )
+                self.elp_gain.append( c['elp-gain'] )
             self.nColors = len(cfg['lights'])
 
     # Turns ON a led using color index in colors list
@@ -83,7 +87,7 @@ class ledControl():
         elif camType == 'baumer': # for baumer
             return [self.baumer_exp[index], self.baumer_gain[index]]
         else:
-            return [self.zwo_exp[index], self.zwo_gain[index]]
+            return [self.elp_exp[index], self.elp_gain[index]]
 
     # Turn all LEDs OFF (called on closing)
     def lightsOff(self, wait=1):

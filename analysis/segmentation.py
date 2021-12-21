@@ -54,7 +54,7 @@ class Segmentation:
         result_fg = cv.bitwise_and(white_img, white_img, mask=mask)
         self.original = cv.add(result_bg, result_fg)
 
-        # calculate the mean values inside each super pixel area
+        # get super pixels labels
         self.labels = slic.getLabels()
         # labels = np.array(labels, dtype=np.int32)
         self.lab_mask = np.zeros(self.labels.shape, dtype=np.uint8)
@@ -62,6 +62,10 @@ class Segmentation:
         self.dim_x = img.shape[1]
         self.dim_y = img.shape[0]
         self.selected = [False] * self.n_spx 
+
+        # init mask for the selection 
+        self.redImg = np.full( (self.lab_mask.shape[0], self.lab_mask.shape[1], 3), 255, self.lab_mask.dtype)
+        self.redImg[:,:] = (0, 0, 255)
 
         # change result to bgr for showing it on the screen 
         self.original = cv.cvtColor(self.original, cv.COLOR_GRAY2BGR )
@@ -83,13 +87,8 @@ class Segmentation:
                 self.done = True  # Flag to indicate that at least one superpixel was selected
 
         # Change the color of the selected super pixels
-        d = self.lab_mask.shape
-        redImg = np.full( (d[0], d[1], 3), 255, self.lab_mask.dtype)
-        redImg[:,:] = (0, 0, 255)
-        redMask = cv2.bitwise_and(redImg, redImg, mask=self.lab_mask)
-        # self.result_col = cv2.merge((self.result,self.result,self.result))
+        redMask = cv2.bitwise_and(self.redImg, self.redImg, mask=self.lab_mask)
         self.last  = cv2.addWeighted(redMask , 0.1, self.original, 0.9, 0)
-
         return self.last
 
     # This function save the mask selected with the super pixels
