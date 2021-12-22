@@ -370,6 +370,7 @@ class asioCam():
         data = {}
         data['camera'] = []
         settings = self.camera.get_control_values()
+        settings['type'] = 'zwo'
         data['camera'].append( { str(k) : str(settings[k]) for k in sorted(settings.keys())   } )
     
         data['lights'] = []
