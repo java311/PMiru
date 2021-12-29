@@ -154,8 +154,10 @@ class camWrap():
     def auto_exp_gain_calib(self, with_median, wait, drops, good_frames):
         if self.camType == 'zwo':
             return self.cam.autoExposureGainCalib(with_median, wait, drops, good_frames, min_median = 15, max_median = 200)
+        elif self.camType == 'elp':
+            return self.cam.autoExposureGainCalib(wait=1, drops=20, good_frames=good_frames, min_median = 10, max_median = 200)
         else:
-            return self.cam.autoExposureGainCalib(wait, drops=10, good_frames=good_frames, min_median = 10, max_median = 200)
+            return self.cam.autoExposureGainCalib(wait, drops, good_frames=good_frames, min_median = 10, max_median = 200)
 
 
     def get_img_type(self):
@@ -233,7 +235,10 @@ class camWrap():
             pass  #TODO implement this function for Baumer
 
     def takeSingleShoot(self, path, filename, drops, rot):
-        self.cam.takeSingleShoot(path=path, filename=filename, drops=drops, rot=rot )
+        if self.camType == 'elp':
+            self.cam.takeSingleShoot(path=path, filename=filename, drops=20, rot=rot )
+        else:    
+            self.cam.takeSingleShoot(path=path, filename=filename, drops=drops, rot=rot )
 
     def stopVideoMode(self):
         if self.camType == 'zwo':

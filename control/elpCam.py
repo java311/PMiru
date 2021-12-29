@@ -149,12 +149,12 @@ class elpCam():
     #saves a single taken frame in a file FAKE method 
     #only takes a single frame from the video stream
     #camera imgType is ignored here. Captures are taken with the given imgType
-    def takeSingleShoot(self, path, filename, drops=3, rot=False):
+    def takeSingleShoot(self, path, filename, drops, rot=False):
         fullpath = path + os.path.sep + filename
         # print ("Taking frame...")
 
         # Drop several frames before taking the GOOD one
-        for i in range(drops*10):
+        for i in range(drops):
             # print ("Dropping frame ... " + str(i))
             ret, img = self.camera.read()
 
