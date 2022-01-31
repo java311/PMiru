@@ -14,8 +14,8 @@
  ],
  "lights": [
   {
-   "channel": 0,
-   "device": 5,
+   "channel": 5,
+   "device": 0,
    "wavelenght": 360,
    "zwo-exp": 0.055777,
    "zwo-gain": 50.0,
@@ -25,8 +25,8 @@
    "elp-gain": 121.0
   },
   {
-   "channel": 0,
-   "device": 6,
+   "channel": 6,
+   "device": 0,
    "wavelenght": 400,
    "zwo-exp": 0.08007,
    "zwo-gain": 50.0,
@@ -36,8 +36,8 @@
    "elp-gain": 206.0
   },
   {
-   "channel": 0,
-   "device": 7,
+   "channel": 7,
+   "device": 0,
    "wavelenght": 8000,
    "zwo-exp": 0.052159,
    "zwo-gain": 50.0,
@@ -47,8 +47,8 @@
    "elp-gain": 91.0
   },
   {
-   "channel": 1,
-   "device": 0,
+   "channel": 0,
+   "device": 1,
    "wavelenght": 620,
    "zwo-exp": 0.035058,
    "zwo-gain": 50.0,
@@ -69,8 +69,8 @@
    "elp-gain": 131.0
   },
   {
-   "channel": 1,
-   "device": 2,
+   "channel": 2,
+   "device": 1,
    "wavelenght": 460,
    "zwo-exp": 0.070785,
    "zwo-gain": 50.0,
@@ -91,8 +91,8 @@
    "elp-gain": 1.0
   },
   {
-   "channel": 0,
-   "device": 1,
+   "channel": 1,
+   "device": 0,
    "wavelenght": 660,
    "zwo-exp": 0.034668,
    "zwo-gain": 49.0,
@@ -102,8 +102,8 @@
    "elp-gain": 131.0
   },
   {
-   "channel": 0,
-   "device": 2,
+   "channel": 2,
+   "device": 0,
    "wavelenght": 740,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
@@ -113,8 +113,8 @@
    "elp-gain": 71.0
   },
   {
-   "channel": 0,
-   "device": 3,
+   "channel": 3,
+   "device": 0,
    "wavelenght": 850,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
@@ -124,8 +124,8 @@
    "elp-gain": 71.0
   },
   {
-   "channel": 0,
-   "device": 4,
+   "channel": 4,
+   "device": 0,
    "wavelenght": 940,
    "zwo-exp": 0.08235,
    "zwo-gain": 50.0,
