@@ -186,7 +186,7 @@ The first control board is connected to the Raspberry using the following PINs:
 | CS   | PIN 36 (SPI CE2) |
 | pin between GND and Clock (5V)   | PIN 2 (5V) |
 
-![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
+![](./img/donut-connections.png)
 
 Then the fist board OUT must connected the the second control board IN.
 To connect them togheter, just connect the SPI OUT of the first board to the same PINS on the SPI IN pins of the second board. 
