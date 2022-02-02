@@ -173,11 +173,10 @@ Just check the orientation of the LCD PIN slot, it is designed to cover all the 
 
 ![](https://maker.pro/storage/g9KLAxU/g9KLAxUiJb9e4Zp1xcxrMhbCDyc3QWPdSunYAoew.png)
 
-#### **LED control boards connections (Amperka)**
-The camera has two control boards to control the LEDs. This is where the cables from the 
-LED plates are connected. Also the boards need to be connected to the Raspberry PINs. 
+#### **LED PCB donut connections **
+The PCB with the donut shape is controled with 2 Amperka boards. This is where the cables from the donut PCB are connected. Then, the boards need to be connected to the Raspberry PINs. 
 
-The first control board is connected to the Raspberry using the following PINs: 
+The first control board must connected to the Raspberry using the following PINs: 
 | Control Board IN  | Raspberry PINs |
 | ------------- | ------------- |
 | pulse icon pin   | PIN 40  (SLCK) |
@@ -185,6 +184,7 @@ The first control board is connected to the Raspberry using the following PINs:
 | DI   | PIN 38 (MOSI SPI1) |
 | CS   | PIN 36 (SPI CE2) |
 | pin between GND and Clock (5V)   | PIN 2 (5V) |
+
 
 ![](./img/donut-connections.png)
 
@@ -199,26 +199,7 @@ To connect them togheter, just connect the SPI OUT of the first board to the sam
 | DI (MOSI) | DI (MOSI) |
 | CS (CS)  | CS (CS) |
 
-The LEDs blades cables must be connetected to the numbered outputs of the boards.
-The cables are numbered, just connect them in the following order:
-
-| LED cable num.  | Control Board port | Control Board number | 
-| ------------- | ------------- | ------------- |
-| cable 0  | + port 0 | board 1 |
-| cable 1  | + port 1 | board 1 | 
-| cable 2  | + port 2 | board 1 |
-| cable 3  | + port 3 | board 1 | 
-| cable 4  | + port 4 | board 1 |
-| cable 5  | + port 5 | board 1 | 
-| cable 6  | + port 6 | board 1 |
-| cable 7  | + port 7 | board 1 | 
-| cable 8  | + port 8 | board 1 |
-| GROUND cable  | any - port | board 1 |
-| cable 9  | + port 0 | board 2 |
-| cable 10  | + port 1 | board 2 |
-| cable 11  | + port 2 | board 2 | 
-
-This is the default order, but you can alter this order by editing the `config.json` file. 
+Inside the donut the LEDs can be connected in any other to the two boards. The order in which you want to controll then can be defined in the `config.json` file. 
 
 #### **Motor connections**
 The motor gets power from the second board, but it is controlled directly from the Raspberry. 
@@ -232,7 +213,7 @@ So, it must be connected the following way:
 
 #### **Camera connection**
 The camera is connected using a USB 2 or USB 3 cable. 
-Even your grandpa can do this. 
+Even your grandpa can do this...
 
 ### How to edit the config.json file 
 TODO 
