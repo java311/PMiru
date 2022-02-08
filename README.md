@@ -7,6 +7,8 @@ An Open Source hyperspectral polarized light camera.
 
 ![](./img/system-diagram.png)
 
+Last Report: https://docs.google.com/presentation/d/1GZiw_HKL_oGRWR23fGHUSqiq1QuJ7bnZjt9xg0AGACE/edit?usp=sharing
+
 ## Actual hardware
 
 ### First prototype
