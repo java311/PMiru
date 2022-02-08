@@ -3,6 +3,25 @@ An Open Source hyperspectral polarized light camera.
 
 ![](https://i.ibb.co/4tCZpwy/img-20210320-wa0007.jpg)
 
+## System Description
+
+![](./img/system-diagram.png)
+
+## Actual hardware
+
+### First prototype
+
+![](./img/first-prototype.png)
+
+### Last prototype
+
+Front 
+![](./img/camera-front.jpeg)
+
+Back
+![](./img/camera-back.jpeg)
+
+
 ## User Guide
 
 #### **Turn ON and start the sofware**
