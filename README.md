@@ -152,7 +152,10 @@ Then you will be asked for a login and password. Ask the slack channel to get th
 ### Factory Reset
 A factory reset **erases all the files in the SD card** and installs PMiru Raspberry image.
 
-1. For this you need to download the **LAST** Raspberry PMiru image file from: https://drive.google.com/drive/folders/1k8Ksq4PHny_fg9CTCQ2_meRpxVSobsXU?usp=sharing 
+1. For this you need to download the **LAST** Raspberry PMiru image file from: 
+https://drive.google.com/file/d/16q-wU4vT5028pIW1XGyObwF1UAekve8w/view?usp=sharing
+(mirror)
+https://mega.nz/file/wwF0jLZD#PZPAzkS5hg5-15VtYI9gsM4PogvQ8KutajpRCXCJKG8
 
 2. Insert the SD-card of the camera and instert it into your PC.
 
